@@ -41,7 +41,10 @@ pip install -r requirements.txt
 How to use it
 -------------
 
-Type 
+Simply type:
+
 ```
 python yield_tables.py
 ```
+
+to create yield tables for AGB stars, SNIa and CC-SNe. These will appear in the data folder. Additionally, plots showing the stellar yields as a function of zero-age main sequence mass will be produced in the folder figures.
