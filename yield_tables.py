@@ -242,14 +242,17 @@ def plot_CCSN_yield_tables():
 
 if __name__ == "__main__":
 
-    # make_AGB_tables()
-    # make_SNIa_tables()
-    # make_CCSN_tables()
-    #
-    # plot_AGB_yield_tables()
+    # Make and combine AGB yield tables
+    make_AGB_tables()
+    make_SNIa_tables()
+    make_CCSN_tables()
 
-    # make_SNIa_tables()
-    # plot_SNIa_yield_tables()
+    plot_AGB_yield_tables()
 
+    # Make SNIa yield tables
+    make_SNIa_tables()
+    plot_SNIa_yield_tables()
+
+    # Make CCSN yield tables
     make_CCSN_tables()
     plot_CCSN_yield_tables()
