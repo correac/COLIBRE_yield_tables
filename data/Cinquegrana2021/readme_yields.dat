@@ -1,0 +1,112 @@
+Tabulated yields from Cinquegrana and Karakas (2021)
+
+1. Folder '77species_yields_indiv': yields and surface abundances for 77 species network. 
+
+	There are two files for each initial mass at each initial metallicity. 
+
+	**note that m7z09 and m5.5z10 were taken out of sample given numerical code issues. So they are not included here. 'surfabund' 		files are only provided for models that enter the TP-AGB phase.**
+
+	1.1 !! Format of files 'yields_m(a)z(b).dat' for initial mass 'a' and initial metallicity 'b':
+
+	Column 1 = isotope species, (i)
+	Column 2 = atomic mass of species (i)
+	Column 3 = final yield of species (i) [in M_sun units]
+	Column 4 = mass of species (i) lost over lifetime
+	Column 5 = initial mass of species (i)
+	Column 6 = final mass fraction of species (i)
+	Column 7 = initial mass fraction of species (i)
+	Column 8 = log10(final mass fraction / initial mass fraction)
+
+	1.2 !! Format of files 'surfabund__m(a)z(b).dat': 
+
+	-These data files quantify elemental behaviour as a function of thermal pulse # on the TP-AGB. 
+	-Each section contains the same columns. The first section being the initial abundances, the second the abundances at the first TP, the third at the second TP etc etc. 
+	
+	Prior to each section: 
+	-We include the TP#, total stellar mass [M_sun], H-exhausted core mass [M_sun], envelope mass [M_sun] and log10(luminosity). 
+	
+	Main columns for each section:
+	 
+	Column 1 = name of element X
+	Column 2 = atomic number
+	Column 3 = log e(X)
+	Column 4 = [X/H]
+	Column 5 = [X/Fe]
+	Column 6 = [X/O]
+	Column 7 = mass fraction of element X
+	
+	Elemental abundances normalised to solar abundances from Table 1 of Asplund. et al (2009), otherwise Table 5 of the same paper. 
+	
+	Data underneath main columns-various isotope ratios. 
+	
+2. Folder '328_species_yields': yields and surface abundances for 328 species network (s-process study). 
+
+	Similiarly to the 77species, there are two files for each initial mass at each initial metallicity.
+	
+	2.1 !! Format of files 'elementalyields_m(a)z(b)_328.dat' for initial mass 'a' and initial metallicity 'b':
+	
+	Prior to each section: 
+	-First line: Initial mass [M_sun], initial metallicity, initial helium abundance and mass extent of the partially mixed zone 
+	-Second line: Final mass [M_sun] and total mass expelled [M_sun]. 
+
+	Column 1 = element species, (X)
+	Column 2 = atomic number of species (X)
+	Column 3 = log e(X)
+	Column 4 = [X/H]
+	Column 5 = [X/Fe]
+	Column 6 = X(i) = mass fraction
+	Column 7 = Net M(i) = net yield of element i
+	Column 8 = Mass(i) = initial mass. 
+	
+	-Last line of file: [Rb/Zr], [ls/Fe] = ([Sr/Fe]+[Y/Fe]+[Zr/Fe]) / 3, [hs/Fe] = ([Ba/Fe]+[La/Fe]+[Ce/Fe]) / 3, [hs/ls], [Pb/hs]
+	
+	2.2 !! Format of files 'surfabund__m(a)z(b)_328.dat':
+	
+	-These data files quantify elemental behaviour as a function of thermal pulse # on the TP-AGB. 
+	-Each section contains the same columns. The first section being the initial abundances, the second the abundances at the first TP, the third at the second TP etc etc. 
+	
+	Prior to each section: 
+	-We include the TP#, total stellar mass [M_sun], H-exhausted core mass [M_sun], envelope mass [M_sun] and log10(luminosity). 
+	
+	Main columns for each section:
+	
+	Column 1 = element species, (X)
+	Column 2 = atomic number of species (X)
+	Column 3 = log e(X)
+	Column 4 = [X/H]
+	Column 5 = [X/Fe]
+	Column 6 = [X/O]
+	Column 7 = X(i) = mass fraction
+	
+	Elemental abundances normalised to solar abundances from Table 1 of Asplund. et al (2009), otherwise Table 5 of the same paper. 
+	
+	Data underneath main columns-various isotope ratios.
+	
+3. Folder '77species_yields_weighted'
+
+	This folder contains one file 'weighted_yields.dat'
+	
+	Column 1 = initial metallicity
+	Column 2 = He3
+	Column 3 = He4
+	Column 4 = C12
+	Column 5 = C13
+	Column 6 = N14
+	Column 7 = N15
+	Column 8 = O16
+	Column 9 = O17
+	Column 10 = O18
+	Column 11 = F19
+	Column 12 = Ne22
+	Column 13 = Na23
+	Column 14 = Mg24
+	Column 15 = Mg25
+	Column 16 = Mg26
+	Column 17 = Al26
+	Column 18 = Al27
+	
+	
+	
+
+
+

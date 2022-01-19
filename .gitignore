@@ -1,0 +1,12 @@
+# Python packaging
+env/*
+*.egg-info
+build/*
+dist/*
+
+# Python compiled files
+*__pycache__*
+*.idea/
+
+# MacOS
+*.DS_Store
