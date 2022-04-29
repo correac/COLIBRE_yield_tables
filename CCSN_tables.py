@@ -44,12 +44,6 @@ def read_data(table, metallicity):
     num_species = len(species)
     num_mass_bins = len(masses)
 
-    # if metallicity == 0.001: mfinal = np.array([12.93, 14.92, 17.84, 19.72, 24.42, 29.05, 37.81])
-    # if metallicity == 0.004: mfinal = np.array([12.86, 14.39, 16.59, 19.52, 24.03, 27.56, 32.93])
-    # if metallicity == 0.008: mfinal = extrapolate_mfinal(0.008)
-    # if metallicity == 0.02: mfinal = np.array([12.73, 14.14, 16.76, 18.36, 21.63, 24.58, 21.83])
-    # if metallicity == 0.05: mfinal = np.array([12.73, 14.14, 16.76, 18.36, 21.63, 24.58, 21.83]) #extrapolate_mfinal(0.05)
-
     # compute SN ejecta mass my summing tabulated element masses
     output_sn_mej = np.zeros(masses.size)
     for i in np.arange(2, table.size):
