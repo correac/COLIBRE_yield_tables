@@ -39,20 +39,31 @@ def read_data(table, metallicity):
 
     masses = np.array((13, 15, 18, 20, 25, 30, 40))
     species = np.array([1, 2, 6, 7, 8, 10, 12, 14, 16, 20, 26])  # H, He, C, N, O, Ne, Mg, Si, S, Ca, Fe
+    mass_indices = range(21,28)
     elements = np.array(['H', 'He', 'C', 'N', 'O', 'Ne', 'Mg', 'Si', 'S', 'Ca', 'Fe'])
     num_species = len(species)
     num_mass_bins = len(masses)
 
-    if metallicity == 0.001: mfinal = np.array([12.93, 14.92, 17.84, 19.72, 24.42, 29.05, 37.81])
-    if metallicity == 0.004: mfinal = np.array([12.86, 14.39, 16.59, 19.52, 24.03, 27.56, 32.93])
-    if metallicity == 0.008: mfinal = extrapolate_mfinal(0.008)
-    if metallicity == 0.02: mfinal = np.array([12.73, 14.14, 16.76, 18.36, 21.63, 24.58, 21.83])
-    if metallicity == 0.05: mfinal = extrapolate_mfinal(0.05)
+    # if metallicity == 0.001: mfinal = np.array([12.93, 14.92, 17.84, 19.72, 24.42, 29.05, 37.81])
+    # if metallicity == 0.004: mfinal = np.array([12.86, 14.39, 16.59, 19.52, 24.03, 27.56, 32.93])
+    # if metallicity == 0.008: mfinal = extrapolate_mfinal(0.008)
+    # if metallicity == 0.02: mfinal = np.array([12.73, 14.14, 16.76, 18.36, 21.63, 24.58, 21.83])
+    # if metallicity == 0.05: mfinal = np.array([12.73, 14.14, 16.76, 18.36, 21.63, 24.58, 21.83]) #extrapolate_mfinal(0.05)
 
-    output_wind_mej = masses - mfinal
+    # compute SN ejecta mass my summing tabulated element masses
+    output_sn_mej = np.zeros(masses.size)
+    for i in np.arange(2, table.size):
+        for j in range(masses.size):
+            output_sn_mej[j] += table[i][mass_indices[j]]
 
+    # tabulated remnant masses
     mcut = np.array([table[1][21], table[1][22], table[1][23], table[1][24], table[1][25], table[1][26], table[1][27]])
+
+    # total mass loss is difference between ZAMS mass and remnant mass 
     output_mass_ejected = masses - mcut
+
+    # remaining ejected mass when subtracting away SN ejecta is from stellar winds
+    output_wind_mej = output_mass_ejected - output_sn_mej
 
 
     hydrogen_list = ['H__1', 'H__2']
@@ -130,7 +141,6 @@ def read_data(table, metallicity):
 
         for j in range(num_species):
             j_elem = indexing[elements[j]]
-
             for k in range(len(j_elem)):
                 pick = j_elem[k] == table_elem
                 if pick:
@@ -268,3 +278,6 @@ def make_CCSN_tables():
         MH = Z001.create_dataset('Ejected_mass_in_ccsn', data=Z0000_ccsn_mej)
         MH = Z001.create_dataset('Ejected_mass_in_winds', data=Z0000_wind_mej)
         MH = Z001.create_dataset('Total_Mass_ejected', data=Z0000_mass_ejected)
+        
+if __name__ == "__main__":
+    make_CCSN_tables()
