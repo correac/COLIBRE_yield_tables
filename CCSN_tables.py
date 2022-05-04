@@ -205,7 +205,7 @@ def make_CCSN_tables():
 
 
     # Write data to HDF5
-    with h5py.File('./data/SNII_Nomoto2013.hdf5', 'w') as data_file:
+    with h5py.File('./data/SNII.hdf5', 'w') as data_file:
         Header = data_file.create_group('Header')
 
         description = "Mass ejected in core-collapse SN (in units of solar mass) produced by Nomoto et al. (2013), compilation of tables from Kobayashi et al. (2006), Nomoto et al. (2006). "

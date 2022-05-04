@@ -89,7 +89,7 @@ def make_SNIa_tables():
     mass_Cr = 10**Cr_Fe * Mass_Fe_56 * (mCr_in_cgs / m56Fe_in_cgs)
 
     # Write data to HDF5
-    with h5py.File('./data/SNIa_Kobayashi2020.hdf5', 'w') as data_file:
+    with h5py.File('./data/SNIa.hdf5', 'w') as data_file:
         Header = data_file.create_group('Header')
 
         description = "Yields for SNIa stars (in units of solar mass) taken from Kobayashi et al. (2020)"

@@ -15,7 +15,7 @@ params = {
     "font.family":"Times",
     "text.usetex": True,
     "figure.figsize": (4, 3),
-    "figure.subplot.left": 0.18,
+    "figure.subplot.left": 0.22,
     "figure.subplot.right": 0.95,
     "figure.subplot.bottom": 0.15,
     "figure.subplot.top": 0.93,
@@ -105,7 +105,7 @@ def plot_SNIa_yield_tables():
     ax.yaxis.set_minor_locator(y_minor)
     ax.yaxis.set_minor_formatter(matplotlib.ticker.NullFormatter())
 
-    ax.grid(b=True, which='major', color='grey', linestyle='-', lw=0.2, zorder=0)
+    ax.grid(True, which='major', color='grey', linestyle='-', lw=0.2, zorder=0)
     ax.tick_params(direction='in', axis='both', which='both', pad=4.5)
 
     plt.legend(labelspacing=0.2, handlelength=0.8, handletextpad=0.3, frameon=True, columnspacing=0.4, ncol=1,
