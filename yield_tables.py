@@ -76,7 +76,7 @@ def plot_AGB_yield_tables():
 def plot_SNIa_yield_tables():
 
     # Read data
-    with h5py.File('./data/SNIa_Kobayashi2020.hdf5', 'r') as data_file:
+    with h5py.File('./data/SNIa.hdf5', 'r') as data_file:
         Y = data_file["/Yield"][:]
         Sp_Y = data_file["/Species_names"][:]
 
@@ -119,7 +119,7 @@ def plot_SNIa_yield_tables():
 def plot_CCSN_yield_tables():
 
     # Read data
-    with h5py.File('./data/SNII_Nomoto2013.hdf5', 'r') as data_file:
+    with h5py.File('./data/SNII.hdf5', 'r') as data_file:
         Masses = data_file["Masses"][:]
         Z000_mej_ccsn = data_file["/Yields/Z_0.004/Ejected_mass_in_ccsn"][:][:]
         Z000_mej_wind = data_file["/Yields/Z_0.004/Ejected_mass_in_winds"][:]
@@ -239,6 +239,58 @@ def plot_CCSN_yield_tables():
                    columnspacing=0.4, ncol=2, fontsize=8)
         ax.tick_params(direction='in', axis='both', which='both', pad=4.5)
         plt.savefig('./figures/CCSN_'+file_name, dpi=200)
+
+        ##################################################
+
+    # Plot parameters
+    params = {
+        "font.size": 11,
+        "font.family": "Times",
+        "text.usetex": True,
+        "figure.figsize": (4, 3),
+        "figure.subplot.left": 0.15,
+        "figure.subplot.right": 0.97,
+        "figure.subplot.bottom": 0.15,
+        "figure.subplot.top": 0.93,
+        "figure.subplot.wspace": 0.25,
+        "figure.subplot.hspace": 0.25,
+        "lines.markersize": 3,
+        "lines.linewidth": 1,
+        "figure.max_open_warning": 0,
+    }
+    rcParams.update(params)
+
+    plt.figure()
+
+    ax = plt.subplot(1, 1, 1)
+    ax.grid(True)
+
+    plt.plot(Masses, Z000_mass_loss, '-', label='Total mass lost', color='black')
+    plt.plot(Masses, Z000_mej_wind, '-', label='Total mass ejected in stellar winds', color='grey')
+    plt.plot(Masses, Z000_mej_ccsn[0, :], '-o', label='Mass ejected in CCSN, H', color='tab:blue')
+    plt.plot(Masses, Z000_mej_ccsn[1, :], '-o', label='Mass ejected in CCSN, He', color='darkblue')
+    plt.plot(Masses, Z000_mej_ccsn[2, :], '-o', label='Mass ejected in CCSN, C', color='tab:orange')
+    plt.plot(Masses, Z000_mej_ccsn[3, :], '-o', label='Mass ejected in CCSN, N', color='tab:red')
+    plt.plot(Masses, Z000_mej_ccsn[4, :], '-o', label='Mass ejected in CCSN, O', color='tab:green')
+    plt.plot(Masses, Z000_mej_ccsn[5, :], '-o', label='Mass ejected in CCSN, Ne', color='purple')
+    plt.plot(Masses, Z000_mej_ccsn[6, :], '-o', label='Mass ejected in CCSN, Mg', color='pink')
+    plt.plot(Masses, Z000_mej_ccsn[7, :], '-o', label='Mass ejected in CCSN, Si', color='darkgreen')
+    plt.plot(Masses, Z000_mej_ccsn[8, :], '-o', label='Mass ejected in CCSN, Fe', color='violet')
+
+    mej = Z000_mej_wind + np.sum(Z000_mej_ccsn[:,:], axis=0)
+    plt.plot(Masses, mej, '--', color='black')
+
+    plt.text(28, 2e-3, 'Metallicity Z=0.004 Z$_{\odot}$')
+    plt.xlabel('Initial stellar mass [M$_{\odot}$]')
+    plt.ylabel('Mass ejected [M$_{\odot}$]')
+    plt.xlim([10, 45])
+    plt.ylim([1e-3, 5e3])
+    plt.yscale('log')
+    plt.legend(loc='upper left', labelspacing=0.2, handlelength=0.8, handletextpad=0.3, frameon=False,
+               columnspacing=0.4, ncol=2, fontsize=8)
+    ax.tick_params(direction='in', axis='both', which='both', pad=4.5)
+    plt.savefig('./figures/CCSN_mass_ejected.png', dpi=300)
+
 
 if __name__ == "__main__":
 
