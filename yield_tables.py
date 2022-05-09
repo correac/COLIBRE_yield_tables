@@ -236,7 +236,7 @@ def plot_CCSN_yield_tables():
         # plt.axis([1,50,1e-2,1e1])
         plt.xlim([6, 100])
         plt.legend(loc='upper left', labelspacing=0.2, handlelength=0.8, handletextpad=0.3, frameon=False,
-                   columnspacing=0.4, ncol=2, fontsize=8)
+                   columnspacing=0.4, ncol=2, fontsize=7)
         ax.tick_params(direction='in', axis='both', which='both', pad=4.5)
         plt.savefig('./figures/CCSN_'+file_name, dpi=300)
 
@@ -277,7 +277,7 @@ def plot_CCSN_yield_tables():
 
         plt.plot(Masses, Masses, '--', lw=1, color='grey')
         plt.plot(Masses, Z000_mass_loss, '-', label='Total mass lost', color='black')
-        plt.plot(Masses, Z000_mej_wind, '-', label='Total mass ejected in stellar winds', color='grey')
+        plt.plot(Masses, Z000_mej_wind, '-', label='Mass ejected in stellar winds', color='grey')
         plt.plot(Masses, Z000_mej_ccsn[0, :], '-o', label='Mass ejected in CCSN, H', color='tab:blue')
         plt.plot(Masses, Z000_mej_ccsn[1, :], '-o', label='Mass ejected in CCSN, He', color='darkblue')
         plt.plot(Masses, Z000_mej_ccsn[2, :], '-o', label='Mass ejected in CCSN, C', color='tab:orange')
@@ -291,14 +291,14 @@ def plot_CCSN_yield_tables():
         mej = Z000_mej_wind + np.sum(Z000_mej_ccsn[:,:], axis=0)
         plt.plot(Masses, mej, '--', color='black')
 
-        plt.text(28, 2e-3, 'Metallicity Z=0.0'+Zi+' Z$_{\odot}$')
+        plt.text(42, 2e-3, 'Metallicity Z=0.0'+Zi+' Z$_{\odot}$')
         plt.xlabel('Initial stellar mass [M$_{\odot}$]')
         plt.ylabel('Mass ejected [M$_{\odot}$]')
         plt.xlim([6, 100])
         plt.ylim([1e-3, 5e3])
         plt.yscale('log')
         plt.legend(loc='upper left', labelspacing=0.2, handlelength=0.8, handletextpad=0.3, frameon=False,
-                   columnspacing=0.4, ncol=2, fontsize=8)
+                   columnspacing=0.4, ncol=2, fontsize=7)
         ax.tick_params(direction='in', axis='both', which='both', pad=4.5)
         plt.savefig("./figures/CCSN_mass_ejected_Z0"+Zi+".png", dpi=300)
 

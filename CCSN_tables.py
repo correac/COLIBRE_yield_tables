@@ -282,6 +282,8 @@ def make_CCSN_tables():
         MH = Z001.create_dataset('Ejected_mass_in_winds', data=Z0000_wind_mej)
         MH = Z001.create_dataset('Total_Mass_ejected', data=Z0000_mass_ejected)
 
+    # This option will rewrite the tables, expand them to include data
+    # for stars in the mass range 6-100 Msun.
     apply_linear_extrapolation()
     
 
@@ -391,24 +393,12 @@ def apply_linear_extrapolation():
                         mej = linear(Mi, *hme_mej_cc_popt)
                         mej_ccsn_extrapolated[elem, i] = np.max([0, mej])
 
-            # Some safety, we do not want that, because of linear extrapolation, we produce more
-            # metals than the initial star mass! If it happens lower mass ejected for H and He.
+            # Some safety here in the calculate of total mass ejected.
             for i, Mi in enumerate(M_extrapolated):
                 total = mej_wind_extrapolated[i] + np.sum(mej_ccsn_extrapolated[:,i], axis=0)
 
                 if total > mass_loss_ccnn_extrapolated[i]:
-                    diff = total - mass_loss_ccnn_extrapolated[i]
-                    mej_ccsn_extrapolated[0,i] -= diff
-
-                total = mej_wind_extrapolated[i] + np.sum(mej_ccsn_extrapolated[:,i], axis=0)
-
-                if total > Mi:
-                    diff = total - Mi
-                    mej_ccsn_extrapolated[1,i] -= diff
-                        
-                total = mej_wind_extrapolated[i] + np.sum(mej_ccsn_extrapolated[:,i], axis=0)
-
-                #print(Zi, total, Mi, Mi-total, mej_wind_extrapolated[i])
+                    mass_loss_ccnn_extrapolated[i] = total
 
 
             Z00 = Data.create_group('Z_0.0'+Zi )
