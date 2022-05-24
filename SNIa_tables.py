@@ -103,8 +103,6 @@ def make_SNIa_tables():
         date_int = int(datetime.today().strftime('%Y%m%d'))
         date_string = data_file.create_dataset('Date_string', data=np.array([date_int]))
 
-        Header.attrs["DateGenerated"] = 
-        
         Reference = np.string_(['Kobayashi, C., et al., (2020) ApJ Vol 895, 2, 138'])
         MH = data_file.create_dataset('Reference', data=Reference)
 

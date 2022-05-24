@@ -76,8 +76,6 @@ def combine_tables():
 
         date_int = int(datetime.today().strftime('%Y%m%d'))
         date_string = data_file.create_dataset('Date_string', data=np.array([date_int]))
-
-        Header.attrs["DateGenerated"] = datetime.today().strftime('%Y-%m-%d')
         
         MH = data_file.create_dataset('Masses', data=yields.mass_bins)
         MH.attrs["Description"] = np.string_("Mass bins in units of Msolar")
