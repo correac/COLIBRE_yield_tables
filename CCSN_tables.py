@@ -226,7 +226,8 @@ def make_CCSN_tables():
         contact += " website: camilacorrea.com"
         Header.attrs["Contact"]=np.string_(contact)
 
-        Header.attrs["DateGenerated"] = datetime.today().strftime('%Y-%m-%d')
+        date_int = int(datetime.today().strftime('%Y%m%d'))
+        date_string = data_file.create_dataset('Date_string', data=np.array([date_int]))
         
         Reference = np.string_(['Nomoto, K., et al., (2013) Annual Review of Astronomy and Astrophysics, vol. 51, issue 1, pp. 457-509'])
         MH = data_file.create_dataset('Reference', data=Reference)
@@ -312,7 +313,8 @@ def apply_linear_extrapolation():
         contact += " website: camilacorrea.com"
         Header.attrs["Contact"]=np.string_(contact)
 
-        Header.attrs["DateGenerated"] = datetime.today().strftime('%Y-%m-%d')
+        date_int = int(datetime.today().strftime('%Y%m%d'))
+        date_string = data_file.create_dataset('Date_string', data=np.array([date_int]))
         
         Reference = np.string_(['Nomoto, K., et al., (2013) Annual Review of Astronomy and Astrophysics, vol. 51, issue 1, pp. 457-509'])
         MH = data_file.create_dataset('Reference', data=Reference)
