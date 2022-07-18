@@ -33,9 +33,13 @@ class read_doherty_data:
         self.Z030_total_metals = None
 
     def calculate_total_metals(self):
-        self.Z007_total_metals = - self.yield_z0007[0, :] - self.yield_z0007[1, :]
-        self.Z014_total_metals = - self.yield_z0014[0, :] - self.yield_z0014[1, :]
-        self.Z030_total_metals = - self.yield_z003[0, :] - self.yield_z003[1, :]
+        self.Z007_total_metals = np.sum( self.yield_z0007[2:,:], axis = 0)
+        self.Z014_total_metals = np.sum( self.yield_z0014[2:,:], axis = 0)
+        self.Z030_total_metals = np.sum( self.yield_z003[2:,:], axis = 0)
+
+        # self.Z007_total_metals = - self.yield_z0007[0, :] - self.yield_z0007[1, :]
+        # self.Z014_total_metals = - self.yield_z0014[0, :] - self.yield_z0014[1, :]
+        # self.Z030_total_metals = - self.yield_z003[0, :] - self.yield_z003[1, :]
 
 
 class make_yield_tables:
@@ -84,9 +88,13 @@ class make_yield_tables:
 
     def calculate_total_metals(self):
 
-        self.Z007_total_metals = - self.Z007_yields[0, :] - self.Z007_yields[1, :]
-        self.Z014_total_metals = - self.Z014_yields[0, :] - self.Z014_yields[1, :]
-        self.Z030_total_metals = - self.Z030_yields[0, :] - self.Z030_yields[1, :]
+        self.Z007_total_metals = np.sum( self.Z007_yields[2:,:], axis = 0)
+        self.Z014_total_metals = np.sum( self.Z014_yields[2:,:], axis = 0)
+        self.Z030_total_metals = np.sum( self.Z030_yields[2:,:], axis = 0)
+
+        # self.Z007_total_metals = - self.Z007_yields[0, :] - self.Z007_yields[1, :]
+        # self.Z014_total_metals = - self.Z014_yields[0, :] - self.Z014_yields[1, :]
+        # self.Z030_total_metals = - self.Z030_yields[0, :] - self.Z030_yields[1, :]
 
 
 def make_new_data_range(yields_doherty):
