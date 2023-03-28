@@ -157,11 +157,6 @@ def calculate_yields(yields, index, z_bin, mass_range):
             elif (m <= np.min(initial_mass_data)):
                 f_m = data_yield[j, 0] * m / np.min(initial_mass_data)
 
-            # Limit Carbon destruction?
-            #if (j == 2) & (m >= 8.0):
-            #    select = np.where(initial_mass_data == 8.0)[0]
-            #    f_m = data_yield[j, select[0]]
-
             if z_bin == 0.040: yields.Z040_yields[j, i] = f_m
             if z_bin == 0.050: yields.Z050_yields[j, i] = f_m
             if z_bin == 0.060: yields.Z060_yields[j, i] = f_m

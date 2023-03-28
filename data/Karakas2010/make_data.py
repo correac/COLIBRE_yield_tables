@@ -22,15 +22,26 @@ params = {
 }
 rcParams.update(params)
 
+def plot_Fishlock(index):
+    # Write data to HDF5
+    with h5py.File('../Fishlock2014/AGB_Fishlock2014.hdf5', 'r') as data_file:
+        Masses = data_file["Masses"][:]
+        Y_Z0007 = data_file["/Yields/Z_0.001/Yield"][:][:]
+
+    plt.plot(Masses, Y_Z0007[index, :], '-o', color='tab:green', label='Fishlock+, Z=0.001')
+
+
 def plot_karakas(index):
     # Write data to HDF5
     with h5py.File('../AGB.hdf5', 'r') as data_file:
         Masses = data_file["Masses"][:]
         Y_Z0007 = data_file["/Yields/Z_0.007/Yield"][:][:]
         Y_Z0014 = data_file["/Yields/Z_0.014/Yield"][:][:]
+        Y_Z0030 = data_file["/Yields/Z_0.03/Yield"][:][:]
 
     plt.plot(Masses, Y_Z0007[index, :], '-o', color='tab:blue',label='Karakas+, Z=0.007')
     plt.plot(Masses, Y_Z0014[index, :], '-o', color='crimson',label='Karakas+, Z=0.014')
+    plt.plot(Masses, Y_Z0030[index, :], '-o', color='grey',label='Karakas+, Z=0.03')
 
 class make_yield_tables:
 
@@ -61,7 +72,7 @@ class make_yield_tables:
 
     def read_data(self):
 
-        species_list = np.array(['p','He','C','N','O','Ne','Mg','Si','S','Ca','Fe','Sr','Ba'])
+        species_list = np.array(['p','He','C','N','O','Ne','Mg','Si','S','Ca','Fe','g','g'])
 
         for k in range(self.num_Z_bins):  # two loops, for Z=0.0001 and Z=0.004
 
@@ -117,15 +128,52 @@ class make_yield_tables:
 
     def complete_for_s_process(self):
 
-        with h5py.File('../Fishlock2014/AGB_Fishlock2014.hdf5', 'r') as data_file:
-            Y_Z0001 = data_file["/Yields/Z_0.001/Yield"][:][:]
+        # with h5py.File('../Fishlock2014/AGB_Fishlock2014.hdf5', 'r') as data_file:
+        #     Y_Z001 = data_file["/Yields/Z_0.001/Yield"][:][:]
+        with h5py.File('../AGB.hdf5', 'r') as data_file:
+            Y_Z007 = data_file["/Yields/Z_0.007/Yield"][:][:]
+            Y_Z014 = data_file["/Yields/Z_0.014/Yield"][:][:]
 
-        # Sr
-        self.Z0001_yields[-2,:] = Y_Z0001[-2,:].copy()
-        self.Z004_yields[-2,:] = Y_Z0001[-2,:].copy()
-        # Ba
-        self.Z0001_yields[-1,:] = Y_Z0001[-1,:].copy()
-        self.Z004_yields[-1,:] = Y_Z0001[-1,:].copy()
+        Zbins = np.array([0.007, 0.014])
+        Sr_data_yields = np.zeros((len(self.mass_bins), 2))
+        Ba_data_yields = np.zeros((len(self.mass_bins), 2))
+
+        for j, m in enumerate(self.mass_bins):
+
+            # # For Z=0.004 we interpolate ...
+            # Sr
+            Sr_data_yields[:, 0] = Y_Z007[-2, :]
+            Sr_data_yields[:, 1] = Y_Z014[-2, :]
+            # f_Sr = interpolate.interp1d(Zbins, Sr_data_yields[j, :])
+            # self.Z004_yields[-2,j] = f_Sr(0.004)
+            #
+            # # Ba
+            Ba_data_yields[:, 0] = Y_Z007[-1, :]
+            Ba_data_yields[:, 1] = Y_Z014[-1, :]
+            # f_Ba = interpolate.interp1d(Zbins, Ba_data_yields[j, :])
+            # self.Z004_yields[-1, j] = f_Ba(0.004)
+
+            # For Z=0.0001 we extrapolate ...
+            # Sr
+            # f(x1) = a * x1 + b
+            # f(x2) = a * x2 + b
+            # b = f(x1) - a x1
+            # f(x2) = a (x2 - x1) + f(x1)
+            # a = f(x2) - f(x1) / (x2 - x1)
+            alpha = (np.log10(Sr_data_yields[j, 1]) - np.log10(Sr_data_yields[j, 0])) / (Zbins[1] - Zbins[0])
+            beta = np.log10(Sr_data_yields[j, 1]) - alpha * Zbins[1]
+            self.Z0001_yields[-2, j] = 2 * 10**(alpha * 0.0001 + beta)
+            self.Z004_yields[-2, j] = 2 * 10**(alpha * 0.004 + beta)
+            # self.Z0001_yields[-2, j] = Sr_data_yields[j, 0] * 0.0001 / 0.007
+            # self.Z004_yields[-2, j] = Sr_data_yields[j, 0] * 0.004 / 0.007
+
+            # Ba
+            alpha = (Ba_data_yields[j, 1] - Ba_data_yields[j, 0]) / (Zbins[1] - Zbins[0])
+            beta = Ba_data_yields[j, 1] - alpha * Zbins[1]
+            self.Z0001_yields[-1, j] = alpha * 0.0001 + beta
+            self.Z004_yields[-1, j] = alpha * 0.004 + beta
+            # self.Z0001_yields[-1, j] = Ba_data_yields[j, 0] * 0.0001 / 0.007
+            # self.Z004_yields[-1, j] = Ba_data_yields[j, 0] * 0.004 / 0.007
 
 
     def output_table(self):
@@ -190,8 +238,9 @@ class make_yield_tables:
             ax = plt.subplot(1, 1, 1)
             ax.grid(True)
 
-            plt.plot(self.mass_bins, self.Z0001_yields[i, :], '-o', color='tab:orange',label='Karakas+ 2010, Z=0.0001')
-            plt.plot(self.mass_bins, self.Z004_yields[i, :], '-o', color='tab:purple',label='Karakas+ 2010, Z=0.004')
+            plt.plot(self.mass_bins, self.Z0001_yields[i, :], '-o', color='tab:orange',label='extrapolation, Z=0.0001')
+            plt.plot(self.mass_bins, self.Z004_yields[i, :], '-o', color='tab:purple',label='extrapolation, Z=0.004')
+            plot_Fishlock(i)
             plot_karakas(i)
 
             # H, He, C, N, O, Ne, Mg, Si, S, Ca, Fe, Sr & Ba
@@ -250,12 +299,12 @@ class make_yield_tables:
                 plt.ylabel('Net Yields Sr [M$_{\odot}$]')
                 file_name = 'Yield_tables_Sr.png'
                 # plt.ylim([-0.1, 0.3])
-                # plt.yscale('log')
+                plt.yscale('log')
             if i == 12:
                 plt.ylabel('Net Yields Ba [M$_{\odot}$]')
                 file_name = 'Yield_tables_Ba.png'
                 # plt.ylim([-0.1, 0.3])
-                # plt.yscale('log')
+                plt.yscale('log')
 
             plt.xlabel('Initial stellar mass [M$_{\odot}$]')
             # plt.axis([1,50,1e-2,1e1])

@@ -11,7 +11,7 @@ class make_yield_tables:
     def __init__(self):
 
         # Table details, let's specify metallicity and mass bins :
-        self.Z_bins = np.array([0.007, 0.014, 0.03, 0.04, 0.05, 0.06, 0.07, 0.08, 0.09, 0.1])
+        self.Z_bins = np.array([0.0001, 0.001, 0.004, 0.007, 0.014, 0.03, 0.04, 0.05, 0.06, 0.07, 0.08, 0.09, 0.1])
         self.num_Z_bins = len(self.Z_bins)
 
         self.species = np.array([1, 2, 6, 7, 8, 10, 12, 14, 16, 20, 26, 38, 56]) # H, He, C, N, O, Ne, Mg, Si, S, Ca, Fe, Sr & Ba
@@ -23,6 +23,19 @@ class make_yield_tables:
 def combine_tables():
 
     yields = make_yield_tables()
+
+    with h5py.File('./data/Fishlock2014/AGB_Fishlock2014.hdf5', 'r') as data_file:
+        Y_Z0001 = data_file["/Yields/Z_0.001/Yield"][:][:]
+        Mej_Z0001 = data_file["/Yields/Z_0.001/Ejected_mass"][:]
+        Mtot_Z0001 = data_file["/Yields/Z_0.001/Total_Metals"][:]
+
+    with h5py.File('./data/Karakas2010/AGB_Karakas2010.hdf5', 'r') as data_file:
+        Y_Z00001 = data_file["/Yields/Z_0.0001/Yield"][:][:]
+        Y_Z0004 = data_file["/Yields/Z_0.004/Yield"][:][:]
+        Mej_Z00001 = data_file["/Yields/Z_0.0001/Ejected_mass"][:]
+        Mej_Z0004 = data_file["/Yields/Z_0.004/Ejected_mass"][:]
+        Mtot_Z00001 = data_file["/Yields/Z_0.0001/Total_Metals"][:]
+        Mtot_Z0004 = data_file["/Yields/Z_0.004/Total_Metals"][:]
 
     # Write data to HDF5
     with h5py.File('./data/Karakas2016/AGB_Karakas2016.hdf5', 'r') as data_file:
@@ -64,8 +77,9 @@ def combine_tables():
         Header = data_file.create_group('Header')
 
         description = "Net yields for AGB stars (in units of solar mass) taken from Cinquegrana & Karakas (2021) "
-        description += "for the metallicity range Z=0.04-0.1, and initial mass range 1-8 Msun. For the mass range 9-12Msun, these tables have been extrapolated. "
+        description += "for the metallicity range Z=0.0001-0.1, and initial mass range 1-8 Msun. For the mass range 9-12Msun, these tables have been extrapolated. "
         description += "Additionally, the net yields for AGB stars in the metallicity bins Z=0.03, 0.014 and 0.007 and initial mass range 1-8 Msun are taken from Karakas & Lugaro (2016). "
+        description += "The net yields for metallicity bins Z=0.001 are taken from Fishlock et al. (2014) and for the metallicity bins Z=0.0001 and Z=0.004 are taken from Karakas et al. (2010). "
         description += "For the mass range 9-12Msun, we have interpolated the data from the tables of Doherty et al. (2014)."
         Header.attrs["Description"] = np.string_(description)
 
@@ -90,7 +104,7 @@ def combine_tables():
 
         MH = data_file.create_dataset('Number_of_species', data=np.array([13]))
 
-        Z_names = ['Z_0.007', 'Z_0.014', 'Z_0.03', 'Z_0.04', 'Z_0.05', 'Z_0.06', 'Z_0.07', 'Z_0.08', 'Z_0.09', 'Z_0.10']
+        Z_names = ['Z_0.0001','Z_0.001','Z_0.004', 'Z_0.007', 'Z_0.014', 'Z_0.03', 'Z_0.04', 'Z_0.05', 'Z_0.06', 'Z_0.07', 'Z_0.08', 'Z_0.09', 'Z_0.10']
         var = np.array(Z_names, dtype='S')
         dt = h5py.special_dtype(vlen=str)
         MH = data_file.create_dataset('Yield_names', dtype=dt, data=var)
@@ -101,10 +115,31 @@ def combine_tables():
         dt = h5py.string_dtype(encoding='ascii')
         MH = data_file.create_dataset('Species_names', dtype=dt, data=Element_names)
 
-        Reference = np.string_(['Cinquegrana & Karakas (2021) MNRAS, 3045C; Karakas & Lugaro (2016) ApJ, 825, 26K; Doherty, C L. Gil-Pons, P. Lau, H.H.B Lattanzio, J C and Siess, L. 2014. MNRAS, 437,195'])
+        Reference = np.string_([
+            'Cinquegrana & Karakas (2021) MNRAS, 3045C; '
+            'Karakas & Lugaro (2016) ApJ, 825, 26K; '
+            'Doherty, C L. Gil-Pons, P. Lau, H.H.B Lattanzio, J C and Siess, L. 2014. MNRAS, 437,195; '
+            'Fishlock, C.; Karakas, A.; Lugaro, M.; Yong, D., 2014, ApJ, 797, 1, 44, 25; '
+            'Karakas, A., et al., 2010, MNRAS, 477, 1, 421'
+            ])
         MH = data_file.create_dataset('Reference', data=Reference)
 
         Data = data_file.create_group('Yields')
+
+        Z0001 = Data.create_group('Z_0.0001')
+        MH = Z0001.create_dataset('Yield', data=Y_Z00001)
+        MH = Z0001.create_dataset('Ejected_mass', data=Mej_Z00001)
+        MH = Z0001.create_dataset('Total_Metals', data=Mtot_Z00001)
+
+        Z0001 = Data.create_group('Z_0.001')
+        MH = Z0001.create_dataset('Yield', data=Y_Z0001)
+        MH = Z0001.create_dataset('Ejected_mass', data=Mej_Z0001)
+        MH = Z0001.create_dataset('Total_Metals', data=Mtot_Z0001)
+
+        Z0001 = Data.create_group('Z_0.004')
+        MH = Z0001.create_dataset('Yield', data=Y_Z0004)
+        MH = Z0001.create_dataset('Ejected_mass', data=Mej_Z0004)
+        MH = Z0001.create_dataset('Total_Metals', data=Mtot_Z0004)
 
         Z0001 = Data.create_group('Z_0.007')
         MH = Z0001.create_dataset('Yield', data=Y_Z0007_Karakas)

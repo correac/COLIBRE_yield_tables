@@ -28,6 +28,7 @@ class make_yield_tables:
 
         # Table details, let's specify metallicity and mass bins :
         self.Z_bins = np.array([0.0001, 0.001, 0.004, 0.007, 0.014, 0.03, 0.04, 0.05, 0.06, 0.07, 0.08, 0.09, 0.1])
+        # self.Z_bins = np.array([0.0001, 0.001, 0.004, 0.007, 0.014])
         self.num_Z_bins = len(self.Z_bins)
 
         self.species = np.array([1, 2, 6, 7, 8, 10, 12, 14, 16, 20, 26, 38, 56]) # H, He, C, N, O, Ne, Mg, Si, S, Ca, Fe, Sr & Ba
@@ -124,6 +125,7 @@ def extend_AGB_yield_tables():
         MH = data_file.create_dataset('Number_of_species', data=np.array([13]))
 
         Z_names = ['Z_0.0001','Z_0.001','Z_0.004', 'Z_0.007', 'Z_0.014', 'Z_0.03', 'Z_0.04', 'Z_0.05', 'Z_0.06', 'Z_0.07', 'Z_0.08', 'Z_0.09', 'Z_0.10']
+        # Z_names = ['Z_0.0001','Z_0.001','Z_0.004', 'Z_0.007', 'Z_0.014']
         var = np.array(Z_names, dtype='S')
         dt = h5py.special_dtype(vlen=str)
         MH = data_file.create_dataset('Yield_names', dtype=dt, data=var)
@@ -222,10 +224,10 @@ def extend_AGB_yield_tables():
         plt.plot(yields.mass_bins, Y_Z0004[i, :], '-o', label='Z=0.004')
         plt.plot(yields.mass_bins, Y_Z0007[i, :], '-o', label='Z=0.007')
         plt.plot(yields.mass_bins, Y_Z0014[i, :], '-o', label='Z=0.014')
-        plt.plot(yields.mass_bins, Y_Z003[i, :], '-o', label='Z=0.003')
-        plt.plot(yields.mass_bins, Y_Z005[i, :], '-o', label='Z=0.005')
-        plt.plot(yields.mass_bins, Y_Z007[i, :], '-o', label='Z=0.007')
-        plt.plot(yields.mass_bins, Y_Z010[i, :], '-o', label='Z=0.01')
+        plt.plot(yields.mass_bins, Y_Z003[i, :], '-o', label='Z=0.03')
+        plt.plot(yields.mass_bins, Y_Z005[i, :], '-o', label='Z=0.05')
+        plt.plot(yields.mass_bins, Y_Z007[i, :], '-o', label='Z=0.07')
+        plt.plot(yields.mass_bins, Y_Z010[i, :], '-o', label='Z=0.1')
 
         # H, He, C, N, O, Ne, Mg, Si, S, Ca, Fe, Sr & Ba
         if i == 0:

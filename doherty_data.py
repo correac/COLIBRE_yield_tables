@@ -57,9 +57,6 @@ class make_yield_tables:
         self.Z004_total_metals = np.sum( self.Z004_yields[2:,:], axis = 0)
         self.Z008_total_metals = np.sum( self.Z008_yields[2:,:], axis = 0)
         self.Z020_total_metals = np.sum( self.Z020_yields[2:,:], axis = 0)
-        # self.Z004_total_metals = - self.Z004_yields[0,:] - self.Z004_yields[1,:]
-        # self.Z008_total_metals = - self.Z008_yields[0,:] - self.Z008_yields[1,:]
-        # self.Z020_total_metals = - self.Z020_yields[0,:] - self.Z020_yields[1,:]
 
 
 def calculate_yields(yields, index, z_bin, mass_range):

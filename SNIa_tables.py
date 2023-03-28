@@ -22,6 +22,7 @@ def make_SNIa_tables():
     mMg_in_cgs = 24.3050*mp_in_cgs
     mSi_in_cgs = 28.0855*mp_in_cgs
     mFe_in_cgs = 55.845*mp_in_cgs
+    mNi_in_cgs = 58.6934 * mp_in_cgs
     m56Fe_in_cgs = 56*mp_in_cgs
     mXi = np.array([0, 0, mC_in_cgs, mN_in_cgs, mO_in_cgs,
                     mNe_in_cgs, mMg_in_cgs, mSi_in_cgs, mFe_in_cgs])
@@ -34,6 +35,7 @@ def make_SNIa_tables():
     num_species = len(species)
 
     #[Xi/^56 Fe] == [Xi/Fe]-[Xi/Fe]solar
+    # These are the yield data taken from Fig. 3 from Kobayashi, Leung & Nomoto (2020)
     SNIa_element_abundance = np.array([0, 0, -3.3, 0, -1.9, -3.7, -2.05, -0.25, 0.3])
     Xi_Fe_Lodder = SNIa_element_abundance.copy()
     SNIa_element_mass = np.zeros(len(SNIa_element_abundance))
@@ -77,7 +79,6 @@ def make_SNIa_tables():
 
     # Test Niquel
     Ni_Fe = 0.2 #[Ni/Fe] - [Ni/Fe]solar
-    mNi_in_cgs = 58.6934 * mp_in_cgs
     Ni_Fe_solar = 6.22 - Fe_H_Sun_Lodder
     Ni_Fe = Ni_Fe + Ni_Fe_solar #log10 X(Ni)/X(Fe)
     mass_Ni = 10**Ni_Fe * Mass_Fe_56 * (mNi_in_cgs / m56Fe_in_cgs)
@@ -137,8 +138,9 @@ def make_LeungNomoto_tables():
         contact += " website: camilacorrea.com"
         Header.attrs["Contact"]=np.string_(contact)
 
-        date_int = int(datetime.today().strftime('%Y%m%d'))
-        date_string = data_file.create_dataset('Date_string', data=np.array([date_int]))
+        # date_int = int(datetime.today().strftime('%Y%m%d'))
+        # date_string = data_file.create_dataset('Date_string', data=np.array([date_int]))
+        date_string = data_file.create_dataset('Date_string', data=np.array([20220525]))
 
         Reference = np.string_(['Leung, S. & Nomoto, K., (2018) ApJ, 861, 2, 143'])
         MH = data_file.create_dataset('Reference', data=Reference)

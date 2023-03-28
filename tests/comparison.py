@@ -8,25 +8,6 @@ from scipy.interpolate import interp1d
 from matplotlib.ticker import MultipleLocator
 import matplotlib.ticker as tck
 
-# Plot parameters
-params = {
-    "font.size": 11,
-    "font.family": "Times",
-    "text.usetex": True,
-    "figure.figsize": (4, 2.8),
-    "figure.subplot.left": 0.18,
-    "figure.subplot.right": 0.95,
-    "figure.subplot.bottom": 0.15,
-    "figure.subplot.top": 0.93,
-    "figure.subplot.wspace": 0.25,
-    "figure.subplot.hspace": 0.25,
-    "lines.markersize": 3,
-    "lines.linewidth": 1,
-    "figure.max_open_warning": 0,
-    "axes.axisbelow": True,
-}
-rcParams.update(params)
-
 mass_fraction = np.array([0.73738788833, #H
                           0.24924186942, #He
                           0.0023647215,  #C
@@ -74,17 +55,6 @@ def imf_lin(m):
 
 def integrate_IMF(m_min, m_max):
 
-    # mass_range = np.arange(np.log10(m_min), np.log10(m_max), 0.2)
-    # imf_array = np.zeros(len(mass_range))
-    # for i in range(0,len(mass_range)):
-    #     imf_array[i] = imf_log(10**mass_range[i])
-    #
-    # y_int = simpson(imf_array, dx=0.2)
-    # print('simpson',y_int)
-    #
-    # I = quad(imf_lin, m_min, m_max)
-    # print('quad',I[0])
-
     Masses = np.arange(m_min, m_max)
     imf_array = np.zeros(len(Masses))
     for i in range(0, len(Masses)):
@@ -96,7 +66,7 @@ def integrate_IMF(m_min, m_max):
 def lifetimes(m,Z):
 
     # Write data to HDF5
-    with h5py.File('./data/EAGLE_yieldtables/Lifetimes.hdf5', 'r') as data_file:
+    with h5py.File('../data/EAGLE_yieldtables/Lifetimes.hdf5', 'r') as data_file:
         Masses = data_file["Masses"][:]
         lifetimes = data_file["Lifetimes"][:][:]
         Metallicities = data_file["Metallicities"][:]
@@ -122,46 +92,6 @@ def inverse_lifetime(Z):
 
     return mass_limit
 
-def plot_lifetimes():
-
-    # Write data to HDF5
-    with h5py.File('./data/EAGLE_yieldtables/Lifetimes.hdf5', 'r') as data_file:
-        Masses = data_file["Masses"][:]
-        lifetimes = data_file["Lifetimes"][:][:]
-        Metallicities = data_file["Metallicities"][:]
-
-    ######
-    plt.figure()
-
-    ax = plt.subplot(1, 1, 1)
-    ax.grid(True)
-    plt.grid(linestyle='-',linewidth=0.3)
-
-    plt.plot(Masses, lifetimes[1,:]/1e9, '-',color='tab:blue', label='$Z=0.004$')
-    plt.plot(Masses, lifetimes[3,:]/1e9, '-',color='tab:orange', label='$Z=0.02$')
-    plt.plot(Masses, lifetimes[5,:]/1e9, '-',color='crimson', label='$Z=1$')
-
-    xrange = np.array([0.5,100])
-    yrange = np.array([13.8,13.8])
-    plt.plot(xrange, yrange,'--',color='grey')
-    xrange = np.array([0.91,0.91])
-    yrange = np.array([1e-3,13.8])
-    plt.plot(xrange, yrange,'--',color='grey')
-
-    plt.ylabel('Lifetime [Gyr]')
-    plt.xlabel('Stellar masses [M$_{\odot}$]')
-    plt.axis([0.5, 100, 1e-3, 100])
-    plt.yscale('log')
-    plt.xscale('log')
-    plt.xticks(np.array([0.5,1,10,100]), ('0.5', '1', '10', '100'))
-
-    plt.legend(loc=[0.6, 0.65], labelspacing=0.2, handlelength=0.8,
-               handletextpad=0.3, frameon=True, columnspacing=0.4,
-               ncol=1, fontsize=10)
-    ax.tick_params(direction='in', axis='both', which='both', pad=4.5)
-    plt.savefig('./figures/Lifetimes.png', dpi=300)
-
-
 def read_AGB_COLIBRE(metallicity_flag, metallicity):
 
     total_mass_fraction = 0.0133714
@@ -172,7 +102,7 @@ def read_AGB_COLIBRE(metallicity_flag, metallicity):
     factor = metallicity / total_mass_fraction
 
     # Write data to HDF5
-    with h5py.File('./data/AGB.hdf5', 'r') as data_file:
+    with h5py.File('../data/AGB.hdf5', 'r') as data_file:
         Masses = data_file["Masses"][:]
         Yield = data_file["/Yields/Z_"+metallicity_flag+"/Yield"][:][:]
         Ejected_mass = data_file["/Yields/Z_"+metallicity_flag+"/Ejected_mass"][:]
@@ -219,7 +149,7 @@ def read_AGB_EAGLE(metallicity_flag, metallicity):
     indx = np.array([0, 1, 2, 3, 4, 5, 6, 7, 10])
 
     # Write data to HDF5
-    with h5py.File('./data/EAGLE_yieldtables/AGB.hdf5', 'r') as data_file:
+    with h5py.File('../data/EAGLE_yieldtables/AGB.hdf5', 'r') as data_file:
         Masses = data_file["Masses"][:]
         Yield = data_file["/Yields/Z_"+metallicity_flag+"/Yield"][:][:]
         Ejected_mass = data_file["/Yields/Z_"+metallicity_flag+"/Ejected_mass"][:]
@@ -261,18 +191,6 @@ def read_AGB_EAGLE(metallicity_flag, metallicity):
     #     colibre[i] = simpson(imf_array * stellar_yields[i,:], x=Masses)
 
     return eagle
-
-def SNIa_rates(Mi, Zi):
-    nu = 2e-3 # Msun^-1
-    tau = 2. # Gyr
-    tmin = 40 * 1e6 / 1e9 # Gyr
-    #lifetime = lifetimes(Mi,Zi) # Gyr
-    lifetime = 13.8
-    N_SNIa = nu * (np.exp(-1 * tmin/tau) - np.exp(-1. * lifetime/tau))
-    if lifetime < tmin:
-        N_SNIa = 0
-
-    return N_SNIa
 
 
 def read_SNIa_EAGLE():
@@ -328,119 +246,32 @@ def read_SNIa_COLIBRE():
     return colibre
 
 def plot_AGB():
+
     total_mass_fraction = 0.0133714
     IMF_int = integrate_IMF(0.1, 100)
 
-    colibre = read_AGB_COLIBRE('0.007',0.0013)
-    colibre2 = read_AGB_COLIBRE('0.014',0.014)
+    colibre = read_AGB_COLIBRE('0.014',0.014)
     colibre /= IMF_int
-    colibre2 /= IMF_int
+    colibre *= total_mass_fraction / 0.014
 
-    eagle = read_AGB_EAGLE('0.004', 0.0013)
     eagle_Z0p02 = read_AGB_EAGLE('0.019',0.019)
     eagle_Z0p008 = read_AGB_EAGLE('0.008',0.008)
     Z = np.array([0.008,0.019])
-    eagle2 = eagle_Z0p008
+    eagle = eagle_Z0p008
     for i in range(len(eagle)):
         f = interp1d(Z, np.array([eagle_Z0p008[i], eagle_Z0p02[i]]))
-        eagle2[i] = f(total_mass_fraction)
-
-    eagle /= IMF_int
-    eagle2 /= IMF_int
-    print('eagle',eagle)
-    print('colibre', colibre)
+        eagle[i] = f(total_mass_fraction) / IMF_int
 
     tng = np.array([0.2, 0.07, 0.0012, 0.0008, 0.0015, 0.00045, 0.00015, 0.00018, 0.0003])
     illustris = np.array([0.17, 6e-2, 0.0012, 6.5e-4, 1.3e-3, 4e-4, 1.2e-4, 1.6e-4, 2.5e-4])
 
-    ######
-    plt.figure()
-
-    ax = plt.subplot(1, 1, 1)
-    ax.grid(True)
-    plt.grid(which='major', linestyle='-',linewidth=0.3)
-    plt.grid(which='minor', linestyle=':',linewidth=0.3)
-
     index = np.arange(9) * 1.5
     bar_width = 0.25
-    width = 0.1
     opacity = 0.8
-    plt.bar(index, colibre, bar_width, alpha=1, color='darkblue', label='COLIBRE (Z$=$0.1Z$_{\odot}$)')
-    plt.bar(index + bar_width, eagle, bar_width, alpha=opacity, color='tab:blue', label='EAGLE (Z$=$0.1Z$_{\odot}$)')
-    plt.bar(index + 2 * bar_width, colibre2, bar_width, alpha=opacity, color='tab:orange', label='COLIBRE (Z$=$Z$_{\odot}$)')
-    plt.bar(index + 3 * bar_width, eagle2, bar_width, alpha=opacity, color='lightgreen', label='EAGLE (Z$=$Z$_{\odot}$)')
-    # plt.bar(index + 2 * bar_width, tng, bar_width, alpha=opacity, color='tab:orange', label='TNG(Z$=$Z$_{\odot}$)')
-    # plt.bar(index + 3 * bar_width, illustris, bar_width, alpha=opacity, color='lightgreen', label='Illustris(Z$=$Z$_{\odot}$)')
-
-    plt.ylabel('Returned Stellar Mass Fraction')
-    plt.xticks(index + bar_width + 0.11, ('H', 'He', 'C', 'N', 'O', 'Ne', 'Mg', 'Si', 'Fe'))
-
-    # props = dict(boxstyle='round', fc='grey', ec='white', alpha=0.2)
-    # ax.text(0.1, 0.94, 'Yields AGB', transform=ax.transAxes,
-    #         fontsize=12, verticalalignment='top', bbox=props)
-    ax.text(0.08, 0.94, 'Yields AGB',
-            transform=ax.transAxes, fontsize=12, verticalalignment='top')
-
-    plt.tight_layout()
-    plt.axis([-0.5, 13.5, 1e-6, 1])
-#    plt.axis([-0.5, 13.5, 1e-5, 1])
-    plt.yscale('log')
-    plt.legend(loc=[0.5, 0.65], labelspacing=0.2, handlelength=0.8,
-               handletextpad=0.3, frameon=False, columnspacing=0.4,
-               ncol=1, fontsize=10)
-    ax.tick_params(direction='in', axis='both', which='both', pad=4.5)
-    plt.tight_layout()
-    plt.savefig('./figures/Comparison_AGBYield_tables_Z0p1Zsun.png', dpi=300)
-
-
-def plot_SNIa():
-
-    colibre = read_SNIa_COLIBRE()
-    eagle = read_SNIa_EAGLE()
-
-    tng = np.array([1e-8, 1e-8, 6e-5, 1e-8, 2e-4, 6e-6, 1.5e-5, 2e-4, 1e-3])
-    illustris = np.array([1e-8, 1e-8, 3e-5, 1e-8, 8e-5, 2e-6, 8e-6, 9e-5, 4.5e-4])
-
-    # Plot
-    plt.figure()
-    ax = plt.subplot(1, 1, 1)
-    ax.grid(True)
-    plt.grid(which='major', linestyle='-',linewidth=0.3)
-    plt.grid(which='minor', linestyle=':',linewidth=0.3)
-
-    index = np.arange(9) * 1.5
-    bar_width = 0.25
-    width = 0.1
-    opacity = 0.8
-    plt.bar(index, colibre, bar_width, alpha=1, color='darkblue', label='COLIBRE')
+    plt.bar(index, colibre, bar_width, alpha=opacity, color='darkblue', label='COLIBRE')
     plt.bar(index + bar_width, eagle, bar_width, alpha=opacity, color='tab:blue', label='EAGLE')
     plt.bar(index + 2 * bar_width, tng, bar_width, alpha=opacity, color='tab:orange', label='TNG')
     plt.bar(index + 3 * bar_width, illustris, bar_width, alpha=opacity, color='lightgreen', label='Illustris')
-
-    plt.ylabel('Returned Stellar Mass Fraction')
-    plt.xticks(index + bar_width + 0.11, ('H', 'He', 'C', 'N', 'O', 'Ne', 'Mg', 'Si', 'Fe'))
-
-    props = dict(boxstyle='round', fc='grey', ec='white', alpha=0.2)
-    ax.text(0.1, 0.94, 'Yields SNIa', transform=ax.transAxes,
-            fontsize=12, verticalalignment='top', bbox=props)
-
-    plt.tight_layout()
-    plt.axis([-0.5, 13.5, 1e-7, 1e-1])
-    plt.yscale('log')
-    plt.legend(loc=[0.6, 0.65], labelspacing=0.2, handlelength=0.8,
-               handletextpad=0.3, frameon=False, columnspacing=0.4,
-               ncol=1, fontsize=10)
-
-    locmaj = matplotlib.ticker.LogLocator(base=10, numticks=12)
-    ax.yaxis.set_major_locator(locmaj)
-    locmin = matplotlib.ticker.LogLocator(base=10.0, subs=(0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9), numticks=12)
-    ax.yaxis.set_minor_locator(locmin)
-    ax.yaxis.set_minor_formatter(matplotlib.ticker.NullFormatter())
-
-    ax.tick_params(direction='in', axis='both', which='both', pad=4.5)
-    plt.tight_layout()
-    plt.savefig('./figures/Comparison_SNIaYield_tables_Z0p1Zsun.png', dpi=300)
-
 
 def read_SNII_COLIBRE(metallicity_flag, metallicity):
 
@@ -452,7 +283,7 @@ def read_SNII_COLIBRE(metallicity_flag, metallicity):
     factor = metallicity / total_mass_fraction
 
     # Write data to HDF5
-    with h5py.File('./data/SNII_linear_extrapolation.hdf5', 'r') as data_file:
+    with h5py.File('../data/SNII_linear_extrapolation.hdf5', 'r') as data_file:
         Masses = data_file["Masses"][:]
         Ejected_mass_winds = data_file["/Yields/Z_"+metallicity_flag+"/Ejected_mass_in_winds"][:]
         Ejected_mass_ccsn = data_file["/Yields/Z_"+metallicity_flag+"/Ejected_mass_in_ccsn"][:][:]
@@ -464,7 +295,7 @@ def read_SNII_COLIBRE(metallicity_flag, metallicity):
     num_elements = len(mass_fraction)
     stellar_yields = np.zeros((num_elements, num_mass_bins))
     # total_yields = np.zeros(num_mass_bins)
-    boost_factors = np.array([1,1,2.5,2,1,0.7,0.7,0.4,1])
+    boost_factors = np.array([1,1,2.5,0.5,1,0.7,0.7,0.4,1])
 
     for i in range(num_mass_bins):
         stellar_yields[:, i] = Ejected_mass_ccsn[indx, i] + factor * mass_fraction * Ejected_mass_winds[i]
@@ -499,7 +330,7 @@ def read_SNII_EAGLE(metallicity_flag, metallicity):
     indx = np.array([0, 1, 2, 3, 4, 5, 6, 7, 10])
 
     # Write data to HDF5
-    with h5py.File('./data/EAGLE_yieldtables/SNII.hdf5', 'r') as data_file:
+    with h5py.File('../data/EAGLE_yieldtables/SNII.hdf5', 'r') as data_file:
         Masses = data_file["Masses"][:]
         Yield = data_file["/Yields/Z_"+metallicity_flag+"/Yield"][:][:]
         Ejected_mass = data_file["/Yields/Z_"+metallicity_flag+"/Ejected_mass"][:]
@@ -542,19 +373,12 @@ def plot_SNII():
 
     total_mass_fraction = 0.0133714
     IMF_int = integrate_IMF(0.1, 100)
-
-    colibre2 = read_SNII_COLIBRE('0.001',0.001)
-    eagle2 = read_SNII_EAGLE('0.0004',0.001)
-    eagle2 /= IMF_int
-    colibre2 /= IMF_int
-
-
+    Z = np.array([0.008,0.02])
     colibre_Z0p02 = read_SNII_COLIBRE('0.020',0.02)
     colibre_Z0p008 = read_SNII_COLIBRE('0.008',0.008)
     colibre = colibre_Z0p02
     eagle_Z0p02 = read_SNII_EAGLE('0.02',0.02)
     eagle_Z0p008 = read_SNII_EAGLE('0.008',0.008)
-    Z = np.array([0.008,0.02])
     eagle = eagle_Z0p008
     for i in range(len(eagle)):
         f = interp1d(Z, np.array([eagle_Z0p008[i], eagle_Z0p02[i]]))
@@ -568,50 +392,47 @@ def plot_SNII():
     tng = np.array([8e-2, 6.5e-2, 2.5e-3, 5e-4, 1.5e-2, 5e-3, 1.5e-3, 1.1e-3, 8e-4])
     illustris = np.array([1.1e-1, 8e-2, 8.5e-3, 9e-4, 1.7e-2, 2.1e-3, 5e-4, 1.8e-3, 1.5e-3])
 
-    print(tng/colibre)
-    print(np.mean(tng/colibre))
-
     ####
-    plt.figure()
-    ax = plt.subplot(1, 1, 1)
-    ax.grid(True)
-    plt.grid(which='major', linestyle='-',linewidth=0.3)
-    plt.grid(which='minor', linestyle=':',linewidth=0.3)
-
     index = np.arange(9) * 1.5
     bar_width = 0.25
-    width = 0.1
     opacity = 0.8
-    plt.bar(index, colibre2, bar_width, alpha=1, color='darkblue', label='COLIBRE (Z=0.1Z$_{\odot}$)')
-    plt.bar(index + bar_width, eagle2, bar_width, alpha=opacity, color='tab:blue', label='EAGLE (Z=0.1Z$_{\odot}$)')
-    plt.bar(index + 2 * bar_width, colibre, bar_width, alpha=1, color='tab:orange', label='COLIBRE (Z=Z$_{\odot}$)')
-    plt.bar(index + 3 * bar_width, eagle, bar_width, alpha=opacity, color='lightgreen', label='EAGLE (Z=Z$_{\odot}$)')
-    # plt.bar(index + 2 * bar_width, tng, bar_width, alpha=opacity, color='tab:orange', label='TNG')
-    # plt.bar(index + 3 * bar_width, illustris, bar_width, alpha=opacity, color='lightgreen', label='Illustris')
+    plt.bar(index, colibre, bar_width, alpha=1, color='darkblue', label='COLIBRE')
+    plt.bar(index + bar_width, eagle, bar_width, alpha=opacity, color='tab:blue', label='EAGLE')
+    plt.bar(index + 2 * bar_width, tng, bar_width, alpha=opacity, color='tab:orange', label='TNG')
+    plt.bar(index + 3 * bar_width, illustris, bar_width, alpha=opacity, color='lightgreen', label='Illustris')
 
-    plt.ylabel('Returned Stellar Mass Fraction')
-    plt.xticks(index + bar_width + 0.11, ('H', 'He', 'C', 'N', 'O', 'Ne', 'Mg', 'Si', 'Fe'))
 
-    props = dict(boxstyle='round', fc='grey', ec='white', alpha=0.2)
-    ax.text(0.1, 0.94, 'Yields SNII', transform=ax.transAxes,
-            fontsize=12, verticalalignment='top', bbox=props)
-
-    plt.tight_layout()
-    plt.axis([-0.5, 13.5, 1e-5, 1])
-    plt.yscale('log')
-    plt.legend(loc=[0.5, 0.65], labelspacing=0.2, handlelength=0.8,
-               handletextpad=0.3, frameon=False, columnspacing=0.4,
-               ncol=1, fontsize=10)
-    ax.tick_params(direction='in', axis='both', which='both', pad=4.5)
-    plt.tight_layout()
-    plt.savefig('./figures/Comparison_SNIIYield_tables_Z0p1Zsun.png', dpi=300)
-#    plt.savefig('./figures/Comparison_SNIIYield_tables.png', dpi=300)
-
-def read_Nomoto():
+def read_SNIa_EAGLE():
 
     # Write data to HDF5
-    with h5py.File('./data/SNIa_W7LeungNomoto2018.hdf5', 'r') as data_file:
+    with h5py.File('../data/EAGLE_yieldtables/SNIa.hdf5', 'r') as data_file:
         stellar_yields = data_file["Yield"][:]
+
+    indx = np.array([0,1,5,6,7,9,11,13,25])
+    stellar_yields = stellar_yields[indx]
+    total_mass_fraction = 0.0133714
+    mass_limit = inverse_lifetime(total_mass_fraction)
+
+    IMF_int = integrate_IMF(0.1, 100)
+
+    masses = np.arange(np.min(mass_limit),100,0.1)
+    IMF = np.zeros(len(masses))
+    NSNIa = 2e-3 # Msun^-1
+    for i in range(len(masses)):
+        IMF[i] = imf_lin(masses[i])
+
+    integral_mej = simpson(IMF * NSNIa * masses, x=masses)
+
+    colibre = stellar_yields * integral_mej / IMF_int
+    return colibre
+
+def read_SNIa_COLIBRE():
+
+    # Write data to HDF5
+    with h5py.File('../data/LeungNomoto2018/SNIa_W7LeungNomoto2018.hdf5', 'r') as data_file:
+        stellar_yields = data_file["Yield"][:]
+    # with h5py.File('../data/SNIa.hdf5', 'r') as data_file:
+    #     stellar_yields = data_file["Yield"][:]
 
     total_mass_fraction = 0.0133714
     mass_limit = inverse_lifetime(total_mass_fraction)
@@ -620,78 +441,119 @@ def read_Nomoto():
 
     masses = np.arange(np.min(mass_limit),100,0.1)
     IMF = np.zeros(len(masses))
-    NSNIa = np.zeros(len(masses))
+    NSNIa = 2e-3 # Msun^-1
     for i in range(len(masses)):
         IMF[i] = imf_lin(masses[i])
-        NSNIa[i] = SNIa_rates(masses[i], total_mass_fraction)
-
 
     integral_mej = simpson(IMF * NSNIa * masses, x=masses)
 
     colibre = stellar_yields * integral_mej / IMF_int
     return colibre
 
-def plot_SNIa2():
+
+def plot_SNIa():
 
     colibre = read_SNIa_COLIBRE()
     eagle = read_SNIa_EAGLE()
-    nomoto = read_Nomoto()
 
     tng = np.array([1e-8, 1e-8, 6e-5, 1e-8, 2e-4, 6e-6, 1.5e-5, 2e-4, 1e-3])
-    # illustris = np.array([1e-8, 1e-8, 3e-5, 1e-8, 8e-5, 2e-6, 8e-6, 9e-5, 4.5e-4])
-
-    # Plot
-    plt.figure()
-    ax = plt.subplot(1, 1, 1)
-    ax.grid(True)
-    plt.grid(which='major', linestyle='-',linewidth=0.3)
-    plt.grid(which='minor', linestyle=':',linewidth=0.3)
+    illustris = np.array([1e-8, 1e-8, 3e-5, 1e-8, 8e-5, 2e-6, 8e-6, 9e-5, 4.5e-4])
 
     index = np.arange(9) * 1.5
     bar_width = 0.25
     width = 0.1
     opacity = 0.8
-    plt.bar(index, colibre, bar_width, alpha=1, color='darkblue', label='Kobayashi, Leung \& Nomoto (2020)')
-    plt.bar(index + bar_width, eagle, bar_width, alpha=opacity, color='tab:blue', label='Thielemann et al. (2003)')
-    plt.bar(index + 2 * bar_width, tng, bar_width, alpha=opacity, color='tab:orange', label='Nomoto et al. (1997)')
-    plt.bar(index + 3 * bar_width, nomoto, bar_width, alpha=opacity, color='lightgreen', label='Leung \& Nomoto (2018)')
+    plt.bar(index, colibre, bar_width, alpha=1, color='darkblue', label='COLIBRE')
+    plt.bar(index + bar_width, eagle, bar_width, alpha=opacity, color='tab:blue', label='EAGLE')
+    plt.bar(index + 2 * bar_width, tng, bar_width, alpha=opacity, color='tab:orange', label='TNG')
+    plt.bar(index + 3 * bar_width, illustris, bar_width, alpha=opacity, color='lightgreen', label='Illustris')
+
+def make_comparison():
+
+    # Plot parameters
+    params = {
+        "font.size": 13,
+        "font.family": "Times",
+        "text.usetex": True,
+        "figure.figsize": (10, 3.8),
+        "figure.subplot.left": 0.07,
+        "figure.subplot.right": 0.99,
+        "figure.subplot.bottom": 0.1,
+        "figure.subplot.top": 0.95,
+        "figure.subplot.wspace": 0.03,
+        "figure.subplot.hspace": 0.03,
+        "lines.markersize": 3,
+        "lines.linewidth": 1,
+        "figure.max_open_warning": 0,
+        "axes.axisbelow": True,
+    }
+    rcParams.update(params)
+
+    ######
+    plt.figure()
+
+    ax = plt.subplot(1, 3, 1)
+    ax.grid(True)
+    plt.grid(which='major', linestyle='-',linewidth=0.3)
+    plt.grid(which='minor', linestyle=':',linewidth=0.3)
+
+    plot_AGB()
+    index = np.arange(9) * 1.5
+    bar_width = 0.25
 
     plt.ylabel('Returned Stellar Mass Fraction')
     plt.xticks(index + bar_width + 0.11, ('H', 'He', 'C', 'N', 'O', 'Ne', 'Mg', 'Si', 'Fe'))
 
-    props = dict(boxstyle='round', fc='grey', ec='white', alpha=0.2)
-    ax.text(0.06, 0.94, 'Yields SNIa', transform=ax.transAxes,
+    props = dict(boxstyle='round', fc='white', ec='black', alpha=1)
+    ax.text(0.35, 0.96, 'AGB yields', transform=ax.transAxes,
             fontsize=12, verticalalignment='top', bbox=props)
 
-    #plt.tight_layout()
-    plt.axis([-0.5, 13.5, 1e-7, 1e-1])
+    plt.axis([-0.5, 13.5, 1e-7, 0.3])
     plt.yscale('log')
-    plt.legend(loc=[0.37, 0.7], labelspacing=0.2, handlelength=0.8,
+    plt.legend(loc=[0.58, 0.6], labelspacing=0.2, handlelength=0.8,
                handletextpad=0.3, frameon=False, columnspacing=0.4,
-               ncol=1, fontsize=8)
-
-    locmaj = matplotlib.ticker.LogLocator(base=10, numticks=12)
-    ax.yaxis.set_major_locator(locmaj)
-    locmin = matplotlib.ticker.LogLocator(base=10.0, subs=(0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9), numticks=12)
-    ax.yaxis.set_minor_locator(locmin)
-    ax.yaxis.set_minor_formatter(matplotlib.ticker.NullFormatter())
-
+               ncol=1, fontsize=12)
     ax.tick_params(direction='in', axis='both', which='both', pad=4.5)
-    #plt.tight_layout()
-    plt.savefig('./figures/Comparison_SNIaYield_tables_Nomoto.png', dpi=300)
 
+    ########################
+    ########################
+    ax = plt.subplot(1, 3, 2)
+    ax.grid(True)
+    plt.grid(which='major', linestyle='-',linewidth=0.3)
+    plt.grid(which='minor', linestyle=':',linewidth=0.3)
+    plot_SNII()
+
+    props = dict(boxstyle='round', fc='white', ec='black', alpha=1)
+    ax.text(0.35, 0.96, 'CCSN yields', transform=ax.transAxes,
+            fontsize=12, verticalalignment='top', bbox=props)
+
+    plt.xticks(index + bar_width + 0.11, ('H', 'He', 'C', 'N', 'O', 'Ne', 'Mg', 'Si', 'Fe'))
+    plt.axis([-0.5, 13.5, 1e-7, 0.3])
+    plt.yscale('log')
+    ax.tick_params(direction='in', axis='both', which='both', pad=4.5)
+    ax.get_yaxis().set_ticklabels([])
+
+    ########################
+    ########################
+    ax = plt.subplot(1, 3, 3)
+    ax.grid(True)
+    plt.grid(which='major', linestyle='-',linewidth=0.3)
+    plt.grid(which='minor', linestyle=':',linewidth=0.3)
+    plot_SNIa()
+
+    props = dict(boxstyle='round', fc='white', ec='black', alpha=1)
+    ax.text(0.35, 0.96, 'SNIa yields', transform=ax.transAxes,
+            fontsize=12, verticalalignment='top', bbox=props)
+
+    plt.xticks(index + bar_width + 0.11, ('H', 'He', 'C', 'N', 'O', 'Ne', 'Mg', 'Si', 'Fe'))
+    plt.axis([-0.5, 13.5, 1e-7, 0.3])
+    plt.yscale('log')
+    ax.tick_params(direction='in', axis='both', which='both', pad=4.5)
+    ax.get_yaxis().set_ticklabels([])
+
+    plt.savefig('./Comparison_literature_all.png', dpi=300)
 
 
 if __name__ == "__main__":
 
-    plot_all()
-    #plot_lifetimes()
-    #plot_AGB()
-    #plot_SNIa()
-    #plot_SNIa2()
-    #plot_SNII()
-    #comparison_plot()
-    # m_min = 1
-    # m_max = 100
-    # integrate(m_min, m_max)
-
+    make_comparison()

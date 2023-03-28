@@ -37,10 +37,6 @@ class read_doherty_data:
         self.Z014_total_metals = np.sum( self.yield_z0014[2:,:], axis = 0)
         self.Z030_total_metals = np.sum( self.yield_z003[2:,:], axis = 0)
 
-        # self.Z007_total_metals = - self.yield_z0007[0, :] - self.yield_z0007[1, :]
-        # self.Z014_total_metals = - self.yield_z0014[0, :] - self.yield_z0014[1, :]
-        # self.Z030_total_metals = - self.yield_z003[0, :] - self.yield_z003[1, :]
-
 
 class make_yield_tables:
 
@@ -160,7 +156,6 @@ def make_new_data_range(yields_doherty):
 
     yields_doherty.Z007_mass_ejected = mej_0007
     yields_doherty.Z014_mass_ejected = mej_0014
-    # yields_doherty.Z030_mass_ejected = mej_003
     yields_doherty.Z030_mass_ejected = yields_doherty.mej_Z002.copy()
 
     yields_doherty.calculate_total_metals()
