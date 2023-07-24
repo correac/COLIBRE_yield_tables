@@ -39,9 +39,9 @@ def make_W7_Nomoto_model():
         contact += " website: camilacorrea.com"
         Header.attrs["Contact"]=np.string_(contact)
 
-        # date_int = int(datetime.today().strftime('%Y%m%d'))
-        # date_string = data_file.create_dataset('Date_string', data=np.array([date_int]))
-        date_string = data_file.create_dataset('Date_string', data=np.array([20220525]))
+        date_int = int(datetime.today().strftime('%Y%m%d'))
+        date_string = data_file.create_dataset('Date_string', data=np.array([date_int]))
+        # date_string = data_file.create_dataset('Date_string', data=np.array([20220525]))
 
         Reference = np.string_(['Leung, S. & Nomoto, K., (2018) ApJ, 861, 2, 143'])
         MH = data_file.create_dataset('Reference', data=Reference)
@@ -89,9 +89,9 @@ def make_LeungNomoto_tables():
         contact += " website: camilacorrea.com"
         Header.attrs["Contact"]=np.string_(contact)
 
-        # date_int = int(datetime.today().strftime('%Y%m%d'))
-        # date_string = data_file.create_dataset('Date_string', data=np.array([date_int]))
-        date_string = data_file.create_dataset('Date_string', data=np.array([20220525]))
+        date_int = int(datetime.today().strftime('%Y%m%d'))
+        date_string = data_file.create_dataset('Date_string', data=np.array([date_int]))
+        # date_string = data_file.create_dataset('Date_string', data=np.array([20220525]))
 
         Reference = np.string_(['Leung, S. & Nomoto, K., (2018) ApJ, 861, 2, 143'])
         MH = data_file.create_dataset('Reference', data=Reference)

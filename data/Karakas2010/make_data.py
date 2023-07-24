@@ -99,6 +99,8 @@ class make_yield_tables:
                 data_yields = np.zeros(len(initial_mass))
                 for ii in range(len(data_yields)):data_yields[ii] = np.sum(data_yields_prev[index[ii]:index[ii+1]])
 
+                if i == 3: data_yields *= 2  # Boosting Nitrogen
+
                 f = interpolate.interp1d(initial_mass, data_yields)
                 g = interpolate.interp1d(initial_mass, mass_ejected)
 

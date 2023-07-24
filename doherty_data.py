@@ -6,8 +6,8 @@
 
 import numpy as np
 import h5py
-from scipy import interpolate
 import re
+from utils import interpolate_data
 
 class make_yield_tables:
 
@@ -24,42 +24,13 @@ class make_yield_tables:
         self.mass_bins = np.array([7., 7.5, 8., 8.5, 9.0])
         self.num_mass_bins = len(self.mass_bins)
 
-        self.Z004_yields = np.zeros((self.num_species,self.num_mass_bins))
-        self.Z008_yields = np.zeros((self.num_species,self.num_mass_bins))
-        self.Z020_yields = np.zeros((self.num_species,self.num_mass_bins))
-
-        self.Z004_mass_ejected = None
-        self.Z008_mass_ejected = None
-        self.Z020_mass_ejected = None
-
-        self.Z004_total_metals = None
-        self.Z008_total_metals = None
-        self.Z020_total_metals = None
-
         self.file_ending = np.array(['z0004','z0008','z002'])
 
 
-    def add_mass_data(self, mass_ejected, final_mass, z_bin):
 
-        if z_bin == 0.004:
-            self.Z004_mass_ejected = mass_ejected
-            self.Z004_final_mass = final_mass
-        if z_bin == 0.008:
-            self.Z008_mass_ejected = mass_ejected
-            self.Z008_final_mass = final_mass
-        if z_bin == 0.02:
-            self.Z020_mass_ejected = mass_ejected
-            self.Z020_final_mass = final_mass
+def calculate_yields(yields, index, mass_range):
 
-
-    def calculate_total_metals(self):
-
-        self.Z004_total_metals = np.sum( self.Z004_yields[2:,:], axis = 0)
-        self.Z008_total_metals = np.sum( self.Z008_yields[2:,:], axis = 0)
-        self.Z020_total_metals = np.sum( self.Z020_yields[2:,:], axis = 0)
-
-
-def calculate_yields(yields, index, z_bin, mass_range):
+    net_yields = np.zeros((yields.num_species, len(yields.mass_bins)))
 
     data_yield = np.zeros((yields.num_species, len(mass_range)))
     data_mass_ejected = np.zeros(len(mass_range))
@@ -90,64 +61,19 @@ def calculate_yields(yields, index, z_bin, mass_range):
 
     final_mass_data = initial_mass_data - data_mass_ejected
 
-    # Interpolation function..
-    f = interpolate.interp1d(initial_mass_data, final_mass_data)
-
-    mass_ejected = np.zeros(yields.num_mass_bins)
-    final_mass = np.zeros(yields.num_mass_bins)
-    for i, m in enumerate(yields.mass_bins):
-
-        if (m >= np.min(initial_mass_data)) & (m <= np.max(initial_mass_data)):
-            fi_m = f(m)
-        elif (m >= np.max(initial_mass_data)):
-            fi_m = np.max(final_mass_data) * m / np.max(initial_mass_data)
-        elif (m <= np.min(initial_mass_data)):
-            fi_m = np.min(final_mass_data) * m / np.min(initial_mass_data)
-
-        f_m = m - fi_m
-        mass_ejected[i] = f_m
-        final_mass[i] = fi_m
-
-    yields.add_mass_data(mass_ejected, final_mass, z_bin)
+    # Interpolate data...
+    final_mass = interpolate_data(initial_mass_data, final_mass_data, yields.mass_bins)
+    mass_ejected = yields.mass_bins - final_mass
 
     for j in range(yields.num_species):
+        net_yields[j,:] = interpolate_data(initial_mass_data, data_yield[j, :], yields.mass_bins)
 
-        # Interpolation function..
-        f = interpolate.interp1d(initial_mass_data, data_yield[j, :])
-
-        for i, m in enumerate(yields.mass_bins):
-
-            if (m >= np.min(initial_mass_data)) & (m <= np.max(initial_mass_data)):
-                f_m = f(m)
-            elif (m >= np.max(initial_mass_data)):
-                f_m = np.max(data_yield[j, :]) * m / np.max(initial_mass_data)
-            elif (m <= np.min(initial_mass_data)):
-                f_m = np.min(data_yield[j, :]) * m / np.min(initial_mass_data)
-
-            if z_bin == 0.004: yields.Z004_yields[j, i] = f_m
-            if z_bin == 0.008: yields.Z008_yields[j, i] = f_m
-            if z_bin == 0.020: yields.Z020_yields[j, i] = f_m
-
-    return
+    return net_yields, mass_ejected
 
 
 def make_Doherty_table():
 
     yields = make_yield_tables()
-
-    for i, Zi, in enumerate(yields.Z_bins):
-
-        if Zi == 0.008:
-            mass_range = np.array([6.5,7.0,7.5,8,8.5])
-        elif Zi == 0.004:
-            mass_range = np.array([6.5,7.0,7.5,8])
-        else:
-            mass_range = np.array([7.0,7.5,8,8.5,9.0])
-
-        calculate_yields(yields, i, Zi, mass_range)
-
-    yields.calculate_total_metals()
-
 
     # Write data to HDF5
     with h5py.File('./data/Doherty2014/AGB_Doherty2014.hdf5', 'w') as data_file:
@@ -160,45 +86,44 @@ def make_Doherty_table():
         contact += " website: camilacorrea.com"
         Header.attrs["Contact"]=np.string_(contact)
 
-        MH = data_file.create_dataset('Masses', data=yields.mass_bins)
-        MH.attrs["Description"]=np.string_("Mass bins in units of Msolar")
+        mass_data = data_file.create_dataset('Masses', data=yields.mass_bins)
+        mass_data.attrs["Description"]=np.string_("Mass bins in units of Msolar")
 
-        MH = data_file.create_dataset('Metallicities', data=yields.Z_bins)
+        Z_data = data_file.create_dataset('Metallicities', data=yields.Z_bins)
+        Z_data.attrs["Description"]=np.string_("Metallicity bins")
 
-        MH.attrs["Description"]=np.string_("Metallicity bins")
-
-        MH = data_file.create_dataset('Number_of_metallicities', data=yields.num_Z_bins)
-
-        MH = data_file.create_dataset('Number_of_masses', data=yields.num_mass_bins)
-
-        MH = data_file.create_dataset('Number_of_species', data=np.array([13]))
+        data_file.create_dataset('Number_of_metallicities', data=yields.num_Z_bins)
+        data_file.create_dataset('Number_of_masses', data=yields.num_mass_bins)
+        data_file.create_dataset('Number_of_species', data=np.array([13]))
 
         Z_names = ['Z_0.004','Z_0.008','Z_0.02']
         var = np.array(Z_names, dtype='S')
         dt = h5py.special_dtype(vlen=str)
-        MH = data_file.create_dataset('Yield_names', dtype=dt, data=var)
+        data_file.create_dataset('Yield_names', dtype=dt, data=var)
 
-        Z_names = ['Hydrogen','Helium','Carbon','Nitrogen','Oxygen','Neon','Magnesium','Silicon','Sulphur','Calcium','Iron','Strontium','Barium']
-        Element_names = np.string_(Z_names)
+        Element_names = np.string_(['Hydrogen','Helium','Carbon','Nitrogen','Oxygen','Neon','Magnesium','Silicon','Sulphur','Calcium','Iron','Strontium','Barium'])
         dt = h5py.string_dtype(encoding='ascii')
-        MH = data_file.create_dataset('Species_names',dtype=dt,data=Element_names)
+        data_file.create_dataset('Species_names',dtype=dt,data=Element_names)
 
         Reference = np.string_(['Doherty, C L. Gil-Pons, P. Lau, H.H.B Lattanzio, J C and Siess, L. 2014. MNRAS, 437,195'])
-        MH = data_file.create_dataset('Reference', data=Reference)
+        data_file.create_dataset('Reference', data=Reference)
 
         Data = data_file.create_group('Yields')
 
-        Z0001 = Data.create_group('Z_0.004')
-        MH = Z0001.create_dataset('Yield', data=yields.Z004_yields)
-        MH = Z0001.create_dataset('Ejected_mass', data=yields.Z004_mass_ejected)
-        MH = Z0001.create_dataset('Total_Metals', data=yields.Z004_total_metals)
+        for i, Zi, in enumerate(yields.Z_bins):
 
-        Z0001 = Data.create_group('Z_0.008')
-        MH = Z0001.create_dataset('Yield', data=yields.Z008_yields)
-        MH = Z0001.create_dataset('Ejected_mass', data=yields.Z008_mass_ejected)
-        MH = Z0001.create_dataset('Total_Metals', data=yields.Z008_total_metals)
+            if Zi == 0.008:
+                mass_range = np.array([6.5, 7.0, 7.5, 8, 8.5])
+            elif Zi == 0.004:
+                mass_range = np.array([6.5, 7.0, 7.5, 8])
+            else:
+                mass_range = np.array([7.0, 7.5, 8, 8.5, 9.0])
 
-        Z0001 = Data.create_group('Z_0.02')
-        MH = Z0001.create_dataset('Yield', data=yields.Z020_yields)
-        MH = Z0001.create_dataset('Ejected_mass', data=yields.Z020_mass_ejected)
-        MH = Z0001.create_dataset('Total_Metals', data=yields.Z020_total_metals)
+            net_yields, mass_ejected = calculate_yields(yields, i, mass_range)
+            total_metals = np.sum( net_yields[2:,:], axis = 0)
+
+            group_data = Data.create_group(Z_names[i])
+            group_data.create_dataset('Yield', data=net_yields)
+            group_data.create_dataset('Ejected_mass', data=mass_ejected)
+            group_data.create_dataset('Total_Metals', data=total_metals)
+
