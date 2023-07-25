@@ -46,15 +46,15 @@ class make_yield_tables:
             initial_mass, index = np.unique(data[select_species, 0], return_index=True)
             index = np.append(index,len(data[select_species, 0]))
             final_mass = np.unique(data[select_species, 2])
-            mass_ejected = initial_mass - final_mass
+            mass_ejected_data = initial_mass - final_mass
             data_yields = np.zeros(len(initial_mass))
             for ii in range(len(data_yields)):data_yields[ii] = np.sum(data_yields_prev[index[ii]:index[ii+1]])
 
-            #if (z_index == 0) & (i == 3): data_yields *= 1.5  # Boosting Nitrogen
-            #if (z_index == 1) & (i == 3): data_yields *= 1.5  # Boosting Nitrogen
+            # if (z_index == 0) & (i == 3): data_yields *= 2.0  # Boosting Nitrogen
+            # if (z_index == 1) & (i == 3): data_yields *= 2.0  # Boosting Nitrogen
 
             yields[i, :] = interpolate_data(initial_mass, data_yields, self.mass_bins)
-            if i==0: mass_ejected = interpolate_data(initial_mass, mass_ejected, self.mass_bins)
+            if i==0: mass_ejected = interpolate_data(initial_mass, mass_ejected_data, self.mass_bins)
 
         return yields, mass_ejected
 

@@ -4,6 +4,38 @@ from pylab import *
 import matplotlib.pyplot as plt
 from scipy import interpolate
 
+# solar abundance values
+init_abundance_Hydrogen = 0.73738788833  # Initial fraction of particle mass in Hydrogen
+init_abundance_Helium = 0.24924186942  # Initial fraction of particle mass in Helium
+init_abundance_Carbon = 0.0023647215  # Initial fraction of particle mass in Carbon
+init_abundance_Nitrogen = 0.0006928991  # Initial fraction of particle mass in Nitrogen
+init_abundance_Oxygen = 0.00573271036  # Initial fraction of particle mass in Oxygen
+init_abundance_Neon = 0.00125649278  # Initial fraction of particle mass in Neon
+init_abundance_Magnesium = 0.00070797838  # Initial fraction of particle mass in Magnesium
+init_abundance_Silicon = 0.00066495154  # Initial fraction of particle mass in Silicon
+init_abundance_Sulphur = 0
+init_abundance_Calcium = 0
+init_abundance_Iron = 0.00129199252  # Initial fraction of particle mass in Iron
+init_abundance_Strontium = 0
+init_abundance_Barium = 0
+
+init_abundance = np.array([init_abundance_Hydrogen,
+                           init_abundance_Helium,
+                           init_abundance_Carbon,
+                           init_abundance_Nitrogen,
+                           init_abundance_Oxygen,
+                           init_abundance_Neon,
+                           init_abundance_Magnesium,
+                           init_abundance_Silicon,
+                           init_abundance_Sulphur,
+                           init_abundance_Calcium,
+                           init_abundance_Iron,
+                           init_abundance_Strontium,
+                           init_abundance_Barium])
+
+total_mass_fraction = 0.0133714
+
+
 # Plot parameters
 params = {
     "font.size": 11,
@@ -68,52 +100,39 @@ def integrate_imf(mass, stellar_yields):
 
 
 
-def plot_metal_relations_AGB():
+def plot_metal_relations_AGB(file, output_file):
 
-    metallicity_list = np.array(['0.007', '0.014', '0.03', '0.04', '0.05', '0.06', '0.07', '0.08', '0.09', '0.10'])
-    metal_array = np.array([0.007,0.014,0.03,0.04,0.05,0.06,0.07,0.08,0.09,0.10])
+    with h5py.File(file, 'r') as data_file:
+        Z_ind = [x.decode() for x in data_file['Yield_names']]
+        indx = np.arange(len(Z_ind))
+        metal_array = data_file['Metallicities'][:]
+        Masses = data_file["Masses"][:]
 
-    mass_fraction = np.array([0.73738788833, #H
-                              0.24924186942, #He
-                              0.0023647215,  #C
-                              0.0006928991,  #N
-                              0.00573271036, #O
-                              0.00125649278, #Ne
-                              0.00070797838, #Mg
-                              0.00066495154, #Si
-                              0.00129199252, #Fe
-                              0.0, #Sr,
-                              0.0]) #Ba
+    num_mass_bins = len(Masses)
+    num_elements = len(init_abundance)
+    num_metals = len(metal_array)
 
-    total_mass_fraction = 0.0133714
+    total_metal = np.zeros(num_metals)
+    metal_elem_sum = np.zeros(num_metals)
+    metal_elem_zero_sum = np.zeros(num_metals)
 
-    elements = np.array(['Hydrogen','Helium','Carbon','Nitrogen','Oxygen','Neon','Magnesium','Silicon','Iron','Strontium','Barium'])
-    indx = np.array([0, 1, 2, 3, 4, 5, 6, 7, 10, 11, 12])
-
-    total_metal = np.zeros(len(metal_array))
-    metal_elem_sum = np.zeros(len(metal_array))
-    metal_elem_zero_sum = np.zeros(len(metal_array))
-
-    for j, metallicity in enumerate(metallicity_list):
+    for j, metallicity in enumerate(Z_ind):
 
         # Write data to HDF5
-        with h5py.File('./data/AGB.hdf5', 'r') as data_file:
-            Masses = data_file["Masses"][:]
-            Yield = data_file["/Yields/Z_"+metallicity+"/Yield"][:][:]
-            Ejected_mass = data_file["/Yields/Z_"+metallicity+"/Ejected_mass"][:]
-            Total_metals = data_file["/Yields/Z_"+metallicity+"/Total_Metals"][:]
+        with h5py.File(file, 'r') as data_file:
+            Yield = data_file["/Yields/"+metallicity+"/Yield"][:][:]
+            Ejected_mass = data_file["/Yields/"+metallicity+"/Ejected_mass"][:]
+            Total_metals = data_file["/Yields/"+metallicity+"/Total_Metals"][:]
 
         factor = metal_array[j] / total_mass_fraction
 
-        num_mass_bins = len(Masses)
-        num_elements = len(mass_fraction)
         stellar_yields = np.zeros((num_elements, num_mass_bins))
         total_yields = np.zeros(num_mass_bins)
         metal_mass_released = np.zeros(num_elements)
         metal_mass_released_zero = np.zeros(num_elements)
 
         for i in range(num_mass_bins):
-            stellar_yields[:, i] = Yield[indx, i] + factor * mass_fraction * Ejected_mass[i]
+            stellar_yields[:, i] = Yield[indx, i] + factor * init_abundance * Ejected_mass[i]
             total_yields[i] = Total_metals[i] + factor * total_mass_fraction * Ejected_mass[i]
 
         for i in range(num_elements):
@@ -148,7 +167,7 @@ def plot_metal_relations_AGB():
                handletextpad=0.3, frameon=False, columnspacing=0.4,
                ncol=1, fontsize=10)
     ax.tick_params(direction='in', axis='both', which='both', pad=4.5)
-    plt.savefig('./figures/Test_AGB_Yield_tables.png', dpi=300)
+    plt.savefig(output_file+'.png', dpi=300)
 
 
 # def plot_metal_relations_CCSN():
@@ -233,5 +252,5 @@ def plot_metal_relations_AGB():
 
 if __name__ == "__main__":
 
-    plot_metal_relations_AGB()
+    plot_metal_relations_AGB('AGB_test.hdf5', 'AGB_test')
     # plot_metal_relations_CCSN()
