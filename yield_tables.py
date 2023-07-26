@@ -13,6 +13,6 @@ if __name__ == "__main__":
     # plot_SNIa_yield_tables()
 
     # Make CCSN yield tables
-    make_CCSN_tables()
+    # make_CCSN_tables()
 
     # plot_compare_CCSN_yield_tables()

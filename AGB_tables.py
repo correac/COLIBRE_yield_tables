@@ -40,7 +40,7 @@ def combine_tables():
     yields = make_yield_tables()
 
     # Write data to HDF5
-    with h5py.File('./data/AGB_test.hdf5', 'w') as data_file:
+    with h5py.File('./data/AGB.hdf5', 'w') as data_file:
         Header = data_file.create_group('Header')
 
         description = "Net yields for AGB stars (in units of solar mass) taken from Cinquegrana & Karakas (2021) "
@@ -115,4 +115,4 @@ def make_AGB_tables():
     make_Cinquegrana_table()
 
     combine_tables()
-    plot_AGB_tables()
+    # plot_AGB_tables()

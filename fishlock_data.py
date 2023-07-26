@@ -40,7 +40,7 @@ class make_yield_tables:
             initial_mass = data[data[:, 1] == sp, 0]
             mass_ejected = data[data[:, 1] == sp, 4]
 
-            # if i == 3: data_yields *= 2.0 # Boosting Nitrogen!!
+            # if i == 3: data_yields *= 1.5 # Boosting Nitrogen!!
 
             self.yields[i, :] = interpolate_data(initial_mass, data_yields, self.mass_bins)
             mass_ejected_list[i, :] = interpolate_data(initial_mass, mass_ejected, self.mass_bins)
