@@ -23,7 +23,7 @@ rcParams.update(params)
 
 def read_AGB_data(Z_ind):
 
-    with h5py.File('./data/AGB_test.hdf5', 'r') as data_file:
+    with h5py.File('./data/AGB.hdf5', 'r') as data_file:
         Masses = data_file["Masses"][:]
         yields = data_file["/Yields/"+Z_ind+"/Yield"][:][:]
 
@@ -36,6 +36,9 @@ def plot_AGB_tables():
         Z_ind = [x.decode() for x in data_file['Yield_names']]
         indx = np.arange(len(Z_ind))
 
+    color_list = ['grey','darkgreen','lightgreen','darkblue','tab:blue','lightblue',
+                  'pink','purple','tab:orange','crimson','black','brown','darkgrey']
+
     for i, elem in enumerate(indx):
 
         plt.figure()
@@ -45,7 +48,7 @@ def plot_AGB_tables():
         for j in range(len(Z_ind)):
             Masses, yields = read_AGB_data(Z_ind[j])
             label = Z_ind[j].replace("Z_","")
-            plt.plot(Masses, yields[indx[i], :], '-o', label=label)
+            plt.plot(Masses, yields[indx[i], :], '-o', label=label, color=color_list[j])
 
         if indx[i] >= 11: plt.yscale('log')
         plt.xlim(1, 12)

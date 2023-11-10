@@ -108,11 +108,11 @@ def combine_tables():
 
 def make_AGB_tables():
 
-    make_Fishlock_table()
-    make_Doherty_table()
-    make_Karakas_table()
-    make_Karakas2010_table()
-    make_Cinquegrana_table()
-
-    combine_tables()
-    # plot_AGB_tables()
+    # make_Fishlock_table()
+    # make_Doherty_table()
+    # make_Karakas_table()
+    # make_Karakas2010_table()
+    # make_Cinquegrana_table()
+    #
+    # combine_tables()
+    plot_AGB_tables()
