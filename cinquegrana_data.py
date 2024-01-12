@@ -40,7 +40,7 @@ def calculate_yields(yields_info, index, mass_range):
         if not os.path.isfile(file_name):
             file_name = "./data/Cinquegrana2021/" + yields_info.file_ending[index] + "/yields_m%i" % m + yields_info.file_ending[index] + ".dat"
 
-        data = np.loadtxt(file_name, skiprows=2, dtype=np.str)
+        data = np.loadtxt(file_name, skiprows=2, dtype=str)
 
         data_len = len(data[:,0])
         yield_data = np.zeros(data_len)
