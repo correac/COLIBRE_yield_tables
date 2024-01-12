@@ -39,7 +39,7 @@ def calculate_yields(yields, index, mass_range):
     for i, m in enumerate(mass_range):
 
         file_name = "./data/Doherty2014/m%.1f" % m +"_"+ yields.file_ending[index] + ".txt"
-        data = np.loadtxt(file_name, dtype=np.str)
+        data = np.loadtxt(file_name, dtype=np.str_)
 
         data_len = len(data[:,0])
         yield_data = np.zeros(data_len)

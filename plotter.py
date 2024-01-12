@@ -34,30 +34,275 @@ def plot_AGB_tables():
     with h5py.File('./data/AGB.hdf5', 'r') as data_file:
         elements = [x.decode() for x in data_file['Species_names']]
         Z_ind = [x.decode() for x in data_file['Yield_names']]
-        indx = np.arange(len(Z_ind))
 
-    color_list = ['grey','darkgreen','lightgreen','darkblue','tab:blue','lightblue',
-                  'pink','purple','tab:orange','crimson','black','brown','darkgrey']
+    color_list = ['grey','darkgreen','yellowgreen','darkblue','tab:blue','lightblue',
+                  'pink','purple','tab:orange','darkkhaki','tab:red','black','maroon']
 
-    for i, elem in enumerate(indx):
+    # Elements:
+    # ['Hydrogen', 'Helium', 'Carbon', 'Nitrogen', 'Oxygen', 'Neon', 'Magnesium',
+    # 'Silicon', 'Sulphur', 'Calcium', 'Iron', 'Strontium', 'Barium']
 
-        plt.figure()
-        ax = plt.subplot(1, 1, 1)
-        ax.grid(True)
+    # Plot parameters
+    params = {
+        "font.size": 11,
+        "font.family": "Times",
+        "text.usetex": True,
+        "figure.figsize": (9, 7.6),
+        "figure.subplot.left": 0.08,
+        "figure.subplot.right": 0.98,
+        "figure.subplot.bottom": 0.06,
+        "figure.subplot.top": 0.98,
+        "figure.subplot.wspace": 0.35,
+        "figure.subplot.hspace": 0.1,
+        "lines.markersize": 3,
+        "lines.linewidth": 1,
+        "figure.max_open_warning": 0,
+    }
+    rcParams.update(params)
 
-        for j in range(len(Z_ind)):
-            Masses, yields = read_AGB_data(Z_ind[j])
-            label = Z_ind[j].replace("Z_","")
-            plt.plot(Masses, yields[indx[i], :], '-o', label=label, color=color_list[j])
+    plt.figure()
+    ax = plt.subplot(3, 3, 1)
+    plt.grid(linestyle='-', linewidth=0.3)
 
-        if indx[i] >= 11: plt.yscale('log')
-        plt.xlim(1, 12)
-        plt.ylabel('Net Yields ' + elements[elem] + ' [M$_{\odot}$]')
-        plt.xlabel('Initial stellar mass [M$_{\odot}$]')
-        plt.legend(labelspacing=0.2, handlelength=0.8, handletextpad=0.3, frameon=False,
-                   columnspacing=0.4, ncol=3, fontsize=8)
-        ax.tick_params(direction='in', axis='both', which='both', pad=4.5)
-        plt.savefig('./figures/AGB_Yield_tables_' + elements[elem] + '.png', dpi=200)
+    indx = 2 # Carbon!
+
+    for j in range(len(Z_ind)):
+        Masses, yields = read_AGB_data(Z_ind[j])
+        label = Z_ind[j].replace("Z_","")
+        plt.plot(Masses, yields[indx, :], '-o', label=label, color=color_list[j])
+
+    plt.axis([1, 12, -0.15, 0.1])
+    plt.ylabel('Net Yields Carbon [M$_{\odot}$]')
+    plt.xlabel('Initial stellar mass [M$_{\odot}$]')
+    ax.tick_params(direction='in', axis='both', which='both', pad=4.5)
+    xticks = np.array([1, 2, 4, 6, 8, 10, 12])
+    labels = ["1", "2", "4", "6", "8", "10", "12"]
+    plt.xticks(xticks, labels)
+
+    props = dict(boxstyle='square', fc='white', ec='black', alpha=1)
+    ax.text(0.73, 0.94, 'Carbon', transform=ax.transAxes,
+            fontsize=11, verticalalignment='top', bbox=props)
+
+    ####
+    ax = plt.subplot(3, 3, 2)
+    plt.grid(linestyle='-', linewidth=0.3)
+
+    indx = 3 # Nitrogen!
+
+    for j in range(len(Z_ind)):
+        Masses, yields = read_AGB_data(Z_ind[j])
+        label = Z_ind[j].replace("Z_","")
+        plt.plot(Masses, yields[indx, :], '-o', label=label, color=color_list[j])
+
+    plt.axis([1, 12, -0.01, 0.2])
+    plt.ylabel('Net Yields Nitrogen [M$_{\odot}$]')
+    plt.xlabel('Initial stellar mass [M$_{\odot}$]')
+    ax.tick_params(direction='in', axis='both', which='both', pad=4.5)
+    xticks = np.array([1, 2, 4, 6, 8, 10, 12])
+    labels = ["1", "2", "4", "6", "8", "10", "12"]
+    plt.xticks(xticks, labels)
+
+    plt.legend(loc=[0.01, 0.4], labelspacing=0.2, handlelength=0.8, handletextpad=0.3, frameon=False,
+               columnspacing=0.4, ncol=2, fontsize=11)
+
+    props = dict(boxstyle='square', fc='white', ec='black', alpha=1)
+    ax.text(0.7, 0.94, 'Nitrogen', transform=ax.transAxes,
+            fontsize=11, verticalalignment='top', bbox=props)
+
+    ####
+    ax = plt.subplot(3, 3, 3)
+    plt.grid(linestyle='-', linewidth=0.3)
+
+    indx = 4 # Oxygen!
+
+    for j in range(len(Z_ind)):
+        Masses, yields = read_AGB_data(Z_ind[j])
+        label = Z_ind[j].replace("Z_","")
+        plt.plot(Masses, yields[indx, :], '-o', label=label, color=color_list[j])
+
+    plt.axis([1, 12, -0.07, 0.02])
+    plt.ylabel('Net Yields Oxygen [M$_{\odot}$]')
+    plt.xlabel('Initial stellar mass [M$_{\odot}$]')
+    ax.tick_params(direction='in', axis='both', which='both', pad=4.5)
+    xticks = np.array([1, 2, 4, 6, 8, 10, 12])
+    labels = ["1", "2", "4", "6", "8", "10", "12"]
+    plt.xticks(xticks, labels)
+
+    props = dict(boxstyle='square', fc='white', ec='black', alpha=1)
+    ax.text(0.71, 0.94, 'Oxygen', transform=ax.transAxes,
+            fontsize=11, verticalalignment='top', bbox=props)
+
+    ####
+    ax = plt.subplot(3, 3, 4)
+    plt.grid(linestyle='-', linewidth=0.3)
+
+    indx = 5  # Neon!
+
+    for j in range(len(Z_ind)):
+        Masses, yields = read_AGB_data(Z_ind[j])
+        label = Z_ind[j].replace("Z_", "")
+        plt.plot(Masses, yields[indx, :] / 1e-3, '-o', label=label, color=color_list[j])
+
+    plt.axis([1, 12, -2, 8])
+    plt.ylabel(r'Net Yields Neon [$\times 10^{-3}$ M$_{\odot}$]')
+    plt.xlabel('Initial stellar mass [M$_{\odot}$]')
+    ax.tick_params(direction='in', axis='both', which='both', pad=4.5)
+    xticks = np.array([1, 2, 4, 6, 8, 10, 12])
+    labels = ["1", "2", "4", "6", "8", "10", "12"]
+    plt.xticks(xticks, labels)
+
+    props = dict(boxstyle='square', fc='white', ec='black', alpha=1)
+    ax.text(0.78, 0.94, 'Neon', transform=ax.transAxes,
+            fontsize=11, verticalalignment='top', bbox=props)
+
+    ####
+    ax = plt.subplot(3, 3, 5)
+    plt.grid(linestyle='-', linewidth=0.3)
+
+    indx = 6  # Magnesium!
+
+    for j in range(len(Z_ind)):
+        Masses, yields = read_AGB_data(Z_ind[j])
+        label = Z_ind[j].replace("Z_", "")
+        plt.plot(Masses, yields[indx, :]/1e-3, '-o', label=label, color=color_list[j])
+
+    plt.axis([1, 12, -0.2, 2])
+    plt.ylabel(r'Net Yields Magnesium [$\times 10^{-3}$ M$_{\odot}$]')
+    plt.xlabel('Initial stellar mass [M$_{\odot}$]')
+    ax.tick_params(direction='in', axis='both', which='both', pad=4.5)
+    xticks = np.array([1, 2, 4, 6, 8, 10, 12])
+    labels = ["1", "2", "4", "6", "8", "10", "12"]
+    plt.xticks(xticks, labels)
+
+    props = dict(boxstyle='square', fc='white', ec='black', alpha=1)
+    ax.text(0.62, 0.94, 'Magnesium', transform=ax.transAxes,
+            fontsize=11, verticalalignment='top', bbox=props)
+
+    ####
+    ax = plt.subplot(3, 3, 6)
+    plt.grid(linestyle='-', linewidth=0.3)
+
+    indx = 7 # Silicon!
+
+    for j in range(len(Z_ind)):
+        Masses, yields = read_AGB_data(Z_ind[j])
+        label = Z_ind[j].replace("Z_", "")
+        plt.plot(Masses, yields[indx, :]/1e-4, '-o', label=label, color=color_list[j])
+
+    plt.axis([1, 12, -0.5, 1.8])
+    plt.ylabel(r'Net Yields Silicon [$\times 10^{-4}$ M$_{\odot}$]')
+    plt.xlabel('Initial stellar mass [M$_{\odot}$]')
+    ax.tick_params(direction='in', axis='both', which='both', pad=4.5)
+    xticks = np.array([1, 2, 4, 6, 8, 10, 12])
+    labels = ["1", "2", "4", "6", "8", "10", "12"]
+    plt.xticks(xticks, labels)
+
+    props = dict(boxstyle='square', fc='white', ec='black', alpha=1)
+    ax.text(0.72, 0.94, 'Silicon', transform=ax.transAxes,
+            fontsize=11, verticalalignment='top', bbox=props)
+
+    ####
+    ax = plt.subplot(3, 3, 7)
+    plt.grid(linestyle='-', linewidth=0.3)
+
+    indx = 10 # Iron!
+
+    for j in range(len(Z_ind)):
+        Masses, yields = read_AGB_data(Z_ind[j])
+        label = Z_ind[j].replace("Z_", "")
+        plt.plot(Masses, yields[indx, :] / 1e-5, '-o', label=label, color=color_list[j])
+
+    plt.axis([1, 12, -5, 8])
+    plt.ylabel(r'Net Yields Iron [$\times 10^{-5}$ M$_{\odot}$]')
+    plt.xlabel('Initial stellar mass [M$_{\odot}$]')
+    ax.tick_params(direction='in', axis='both', which='both', pad=4.5)
+    xticks = np.array([1, 2, 4, 6, 8, 10, 12])
+    labels = ["1", "2", "4", "6", "8", "10", "12"]
+    plt.xticks(xticks, labels)
+
+    props = dict(boxstyle='square', fc='white', ec='black', alpha=1)
+    ax.text(0.81, 0.94, 'Iron', transform=ax.transAxes,
+            fontsize=11, verticalalignment='top', bbox=props)
+
+    ####
+    ax = plt.subplot(3, 3, 8)
+    plt.grid(linestyle='-', linewidth=0.3)
+
+    indx = 11  # Barium!
+
+    for j in range(len(Z_ind)):
+        Masses, yields = read_AGB_data(Z_ind[j])
+        label = Z_ind[j].replace("Z_", "")
+        plt.plot(Masses, yields[indx, :], '-o', label=label, color=color_list[j])
+
+    plt.axis([1, 12, 1e-11, 1e-5])
+    plt.yscale('log')
+    plt.ylabel(r'Net Yields Barium [M$_{\odot}$]')
+    plt.xlabel('Initial stellar mass [M$_{\odot}$]')
+    ax.tick_params(direction='in', axis='both', which='both', pad=4.5)
+    xticks = np.array([1, 2, 4, 6, 8, 10, 12])
+    labels = ["1", "2", "4", "6", "8", "10", "12"]
+    plt.xticks(xticks, labels)
+
+    props = dict(boxstyle='square', fc='white', ec='black', alpha=1)
+    ax.text(0.73, 0.94, 'Barium', transform=ax.transAxes,
+            fontsize=11, verticalalignment='top', bbox=props)
+
+    ####
+    ax = plt.subplot(3, 3, 9)
+    plt.grid(linestyle='-', linewidth=0.3)
+
+    indx = 12  # Strontium!
+
+    for j in range(len(Z_ind)):
+        Masses, yields = read_AGB_data(Z_ind[j])
+        label = Z_ind[j].replace("Z_", "")
+        plt.plot(Masses, yields[indx, :], '-o', label=label, color=color_list[j])
+
+    plt.axis([1, 12, 1e-12, 1e-5])
+    plt.yscale('log')
+    plt.ylabel(r'Net Yields Strontium [M$_{\odot}$]')
+    plt.xlabel('Initial stellar mass [M$_{\odot}$]')
+    ax.tick_params(direction='in', axis='both', which='both', pad=4.5)
+    xticks = np.array([1, 2, 4, 6, 8, 10, 12])
+    labels = ["1", "2", "4", "6", "8", "10", "12"]
+    plt.xticks(xticks, labels)
+
+    props = dict(boxstyle='square', fc='white', ec='black', alpha=1)
+    ax.text(0.66, 0.94, 'Strontium', transform=ax.transAxes,
+            fontsize=11, verticalalignment='top', bbox=props)
+
+    plt.savefig('./figures/AGB_Yield_tables_elements.png', dpi=400)
+
+# def plot_AGB_tables():
+#
+#     with h5py.File('./data/AGB.hdf5', 'r') as data_file:
+#         elements = [x.decode() for x in data_file['Species_names']]
+#         Z_ind = [x.decode() for x in data_file['Yield_names']]
+#         indx = np.arange(len(Z_ind))
+#
+#     color_list = ['grey','darkgreen','lightgreen','darkblue','tab:blue','lightblue',
+#                   'pink','purple','tab:orange','crimson','black','brown','darkgrey']
+#
+#     for i, elem in enumerate(indx):
+#
+#         plt.figure()
+#         ax = plt.subplot(1, 1, 1)
+#         ax.grid(True)
+#
+#         for j in range(len(Z_ind)):
+#             Masses, yields = read_AGB_data(Z_ind[j])
+#             label = Z_ind[j].replace("Z_","")
+#             plt.plot(Masses, yields[indx[i], :], '-o', label=label, color=color_list[j])
+#
+#         if indx[i] >= 11: plt.yscale('log')
+#         plt.xlim(1, 12)
+#         plt.ylabel('Net Yields ' + elements[elem] + ' [M$_{\odot}$]')
+#         plt.xlabel('Initial stellar mass [M$_{\odot}$]')
+#         plt.legend(labelspacing=0.2, handlelength=0.8, handletextpad=0.3, frameon=False,
+#                    columnspacing=0.4, ncol=3, fontsize=8)
+#         ax.tick_params(direction='in', axis='both', which='both', pad=4.5)
+#         plt.savefig('./figures/AGB_Yield_tables_' + elements[elem] + '.png', dpi=200)
 
 
 def plot_SNIa_yield_tables():
