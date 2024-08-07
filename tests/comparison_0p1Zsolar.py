@@ -234,24 +234,26 @@ def plot_AGB(total_mass_fraction):
 
     IMF_int = integrate_IMF(0.1, 100)
 
-    colibre_Z0p14 = read_AGB_COLIBRE('0.014',0.014, total_mass_fraction)
-    colibre_Z0p3 = read_AGB_COLIBRE('0.03',0.03, total_mass_fraction)
-    Z = np.array([0.014, 0.03])
+    colibre_Z0p14 = read_AGB_COLIBRE('0.004',0.004, total_mass_fraction)
+    colibre_Z0p3 = read_AGB_COLIBRE('0.001',0.001, total_mass_fraction)
+    Z = np.array([0.004, 0.001])
     colibre = colibre_Z0p3
     for i in range(len(colibre)):
         f = interp1d(Z, np.array([colibre_Z0p14[i], colibre_Z0p3[i]]))
         colibre[i] = f(total_mass_fraction) / IMF_int
 
-    eagle_Z0p02 = read_AGB_EAGLE('0.019',0.019, total_mass_fraction)
-    eagle_Z0p008 = read_AGB_EAGLE('0.008',0.008, total_mass_fraction)
-    Z = np.array([0.008,0.019])
-    eagle = eagle_Z0p008
-    for i in range(len(eagle)):
-        f = interp1d(Z, np.array([eagle_Z0p008[i], eagle_Z0p02[i]]))
-        eagle[i] = f(total_mass_fraction) / IMF_int
+    # eagle_Z0p02 = read_AGB_EAGLE('0.019',0.019, total_mass_fraction)
+    eagle_Z0p008 = read_AGB_EAGLE('0.004',0.004, total_mass_fraction)
 
-    tng = np.array([0.2, 0.07, 0.0012, 0.0008, 0.0015, 0.00045, 0.00015, 0.00018, 0.0003])
-    illustris = np.array([0.17, 6e-2, 0.0012, 6.5e-4, 1.3e-3, 4e-4, 1.2e-4, 1.6e-4, 2.5e-4])
+    # Z = np.array([0.008,0.019])
+    eagle = eagle_Z0p008 * total_mass_fraction / 0.004
+    eagle /= IMF_int
+    # for i in range(len(eagle)):
+    #     f = interp1d(Z, np.array([eagle_Z0p008[i], eagle_Z0p02[i]]))
+    #     eagle[i] = f(total_mass_fraction) / IMF_int
+
+    # tng = np.array([0.2, 0.07, 0.0012, 0.0008, 0.0015, 0.00045, 0.00015, 0.00018, 0.0003])
+    # illustris = np.array([0.17, 6e-2, 0.0012, 6.5e-4, 1.3e-3, 4e-4, 1.2e-4, 1.6e-4, 2.5e-4])
 
     color_list = ['lightskyblue', 'steelblue', 'khaki', 'salmon']
 
@@ -262,17 +264,17 @@ def plot_AGB(total_mass_fraction):
             color=color_list[0], label='COLIBRE', edgecolor='black', linewidth=0.2)
     plt.bar(index + bar_width, eagle, bar_width, alpha=opacity,
             color=color_list[1], label='EAGLE', edgecolor='black', linewidth=0.2)
-    plt.bar(index + 2 * bar_width, tng, bar_width, alpha=opacity,
-            color=color_list[2], label='TNG', edgecolor='black', linewidth=0.2)
-    plt.bar(index + 3 * bar_width, illustris, bar_width, alpha=opacity,
-            color=color_list[3], label='Illustris', edgecolor='black', linewidth=0.2)
+    # plt.bar(index + 2 * bar_width, tng, bar_width, alpha=opacity,
+    #         color=color_list[2], label='TNG', edgecolor='black', linewidth=0.2)
+    # plt.bar(index + 3 * bar_width, illustris, bar_width, alpha=opacity,
+    #         color=color_list[3], label='Illustris', edgecolor='black', linewidth=0.2)
 
-    print('===AGN===')
-    elements = ['H','He','C','N','O','Ne','Mg','Si','Fe']
-    for i, elem in enumerate(elements):
-        print(elem, eagle[i]/colibre[i],'(',colibre[i]/eagle[i],')',
-              tng[i]/colibre[i], '(',colibre[i]/tng[i],')',
-              illustris[i]/colibre[i], '(',colibre[i]/illustris[i],')')
+    # print('===AGN===')
+    # elements = ['H','He','C','N','O','Ne','Mg','Si','Fe']
+    # for i, elem in enumerate(elements):
+    #     print(elem, eagle[i]/colibre[i],'(',colibre[i]/eagle[i],')',
+    #           tng[i]/colibre[i], '(',colibre[i]/tng[i],')',
+    #           illustris[i]/colibre[i], '(',colibre[i]/illustris[i],')')
 
 def read_SNII_COLIBRE(metallicity_flag, metallicity, total_mass_fraction):
 
@@ -363,28 +365,30 @@ def read_SNII_EAGLE(metallicity_flag, metallicity, total_mass_fraction):
 def plot_SNII(total_mass_fraction):
 
     IMF_int = integrate_IMF(0.1, 100)
-    Z = np.array([0.008,0.02])
-    colibre_Z0p02 = read_SNII_COLIBRE('0.020',0.02, total_mass_fraction)
-    colibre_Z0p008 = read_SNII_COLIBRE('0.008',0.008, total_mass_fraction)
+    colibre_Z0p02 = read_SNII_COLIBRE('0.004',0.004, total_mass_fraction)
+    colibre_Z0p008 = read_SNII_COLIBRE('0.001',0.001, total_mass_fraction)
 
-    eagle_Z0p02 = read_SNII_EAGLE('0.02',0.02, total_mass_fraction)
-    eagle_Z0p008 = read_SNII_EAGLE('0.008',0.008, total_mass_fraction)
+    eagle_Z0p02 = read_SNII_EAGLE('0.0004',0.0004, total_mass_fraction)
+    eagle_Z0p008 = read_SNII_EAGLE('0.004',0.004, total_mass_fraction)
 
     num_bins = 9
     colibre = np.zeros(num_bins)
     eagle = np.zeros(num_bins)
 
     for i in range(num_bins):
+        Z = np.array([0.0004, 0.004])
         f = interp1d(Z, np.array([eagle_Z0p008[i], eagle_Z0p02[i]]))
         eagle[i] = f(total_mass_fraction)
+
+        Z = np.array([0.001, 0.004])
         f = interp1d(Z, np.array([colibre_Z0p008[i], colibre_Z0p02[i]]))
         colibre[i] = f(total_mass_fraction)
 
     eagle /= IMF_int
     colibre /= IMF_int
 
-    tng = np.array([8e-2, 6.5e-2, 2.5e-3, 5e-4, 1.5e-2, 5e-3, 1.5e-3, 1.1e-3, 8e-4])
-    illustris = np.array([1.1e-1, 8e-2, 8.5e-3, 9e-4, 1.7e-2, 2.1e-3, 5e-4, 1.8e-3, 1.5e-3])
+    # tng = np.array([8e-2, 6.5e-2, 2.5e-3, 5e-4, 1.5e-2, 5e-3, 1.5e-3, 1.1e-3, 8e-4])
+    # illustris = np.array([1.1e-1, 8e-2, 8.5e-3, 9e-4, 1.7e-2, 2.1e-3, 5e-4, 1.8e-3, 1.5e-3])
 
     color_list = ['lightskyblue', 'steelblue', 'khaki', 'salmon']
 
@@ -396,17 +400,17 @@ def plot_SNII(total_mass_fraction):
             label='COLIBRE', edgecolor='black', linewidth=0.2)
     plt.bar(index + bar_width, eagle, bar_width, alpha=opacity,
             color=color_list[1], label='EAGLE', edgecolor='black', linewidth=0.2)
-    plt.bar(index + 2 * bar_width, tng, bar_width, alpha=opacity,
-            color=color_list[2], label='TNG', edgecolor='black', linewidth=0.2)
-    plt.bar(index + 3 * bar_width, illustris, bar_width, alpha=opacity,
-            color=color_list[3], label='Illustris', edgecolor='black', linewidth=0.2)
+    # plt.bar(index + 2 * bar_width, tng, bar_width, alpha=opacity,
+    #         color=color_list[2], label='TNG', edgecolor='black', linewidth=0.2)
+    # plt.bar(index + 3 * bar_width, illustris, bar_width, alpha=opacity,
+    #         color=color_list[3], label='Illustris', edgecolor='black', linewidth=0.2)
 
-    print('===CCSN===')
-    elements = ['H','He','C','N','O','Ne','Mg','Si','Fe']
-    for i, elem in enumerate(elements):
-        print(elem, eagle[i]/colibre[i],'(',colibre[i]/eagle[i],')',
-              tng[i]/colibre[i], '(',colibre[i]/tng[i],')',
-              illustris[i]/colibre[i], '(',colibre[i]/illustris[i],')')
+    # print('===CCSN===')
+    # elements = ['H','He','C','N','O','Ne','Mg','Si','Fe']
+    # for i, elem in enumerate(elements):
+    #     print(elem, eagle[i]/colibre[i],'(',colibre[i]/eagle[i],')',
+    #           tng[i]/colibre[i], '(',colibre[i]/tng[i],')',
+    #           illustris[i]/colibre[i], '(',colibre[i]/illustris[i],')')
 
 
 def read_SNIa_EAGLE(total_mass_fraction):
@@ -458,8 +462,8 @@ def plot_SNIa(solar_metallicity):
     colibre = read_SNIa_COLIBRE(solar_metallicity)
     eagle = read_SNIa_EAGLE(solar_metallicity)
 
-    tng = np.array([1e-8, 1e-8, 6e-5, 1e-8, 2e-4, 6e-6, 1.5e-5, 2e-4, 1e-3])
-    illustris = np.array([1e-8, 1e-8, 3e-5, 1e-8, 8e-5, 2e-6, 8e-6, 9e-5, 4.5e-4])
+    # tng = np.array([1e-8, 1e-8, 6e-5, 1e-8, 2e-4, 6e-6, 1.5e-5, 2e-4, 1e-3])
+    # illustris = np.array([1e-8, 1e-8, 3e-5, 1e-8, 8e-5, 2e-6, 8e-6, 9e-5, 4.5e-4])
 
     index = np.arange(9) * 1.5
     bar_width = 0.25
@@ -472,23 +476,23 @@ def plot_SNIa(solar_metallicity):
             label='COLIBRE', edgecolor='black', linewidth=0.2)
     plt.bar(index + bar_width, eagle, bar_width, alpha=opacity,
             color=color_list[1], label='EAGLE', edgecolor='black', linewidth=0.2)
-    plt.bar(index + 2 * bar_width, tng, bar_width, alpha=opacity,
-            color=color_list[2], label='TNG', edgecolor='black', linewidth=0.2)
-    plt.bar(index + 3 * bar_width, illustris, bar_width, alpha=opacity,
-            color=color_list[3], label='Illustris', edgecolor='black', linewidth=0.2)
+    # plt.bar(index + 2 * bar_width, tng, bar_width, alpha=opacity,
+    #         color=color_list[2], label='TNG', edgecolor='black', linewidth=0.2)
+    # plt.bar(index + 3 * bar_width, illustris, bar_width, alpha=opacity,
+    #         color=color_list[3], label='Illustris', edgecolor='black', linewidth=0.2)
 
-    print('===SNIa===')
-    elements = ['H','He','C','N','O','Ne','Mg','Si','Fe']
-    for i, elem in enumerate(elements):
-        print(elem, eagle[i]/colibre[i],'(',colibre[i]/eagle[i],')',
-              tng[i]/colibre[i], '(',colibre[i]/tng[i],')',
-              illustris[i]/colibre[i], '(',colibre[i]/illustris[i],')')
+    # print('===SNIa===')
+    # elements = ['H','He','C','N','O','Ne','Mg','Si','Fe']
+    # for i, elem in enumerate(elements):
+    #     print(elem, eagle[i]/colibre[i],'(',colibre[i]/eagle[i],')',
+    #           tng[i]/colibre[i], '(',colibre[i]/tng[i],')',
+    #           illustris[i]/colibre[i], '(',colibre[i]/illustris[i],')')
 
 
 def make_comparison():
 
     # solar_metallicity = 0.0133714
-    solar_metallicity = 0.014
+    solar_metallicity = 0.1 * 0.014
 
     # Plot parameters
     params = {
@@ -522,11 +526,15 @@ def make_comparison():
     bar_width = 0.25
 
     plt.ylabel('Returned Stellar Mass Fraction')
-    plt.xticks(index + bar_width + 0.11, ('H', 'He', 'C', 'N', 'O', 'Ne', 'Mg', 'Si', 'Fe'))
+    plt.xticks(index + bar_width, ('H', 'He', 'C', 'N', 'O', 'Ne', 'Mg', 'Si', 'Fe'))
 
     props = dict(boxstyle='round', fc='white', ec='black', alpha=1)
     ax.text(0.35, 0.96, 'AGB yields', transform=ax.transAxes,
             fontsize=12, verticalalignment='top', bbox=props)
+
+    props = dict(boxstyle='square', fc='khaki', ec='darkblue', alpha=0.7)
+    ax.text(0.71, 0.93, 'Z = 0.1Z$_{\odot}$', transform=ax.transAxes,
+            fontsize=12, verticalalignment='top', bbox=props, color='darkblue')
 
     plt.axis([-0.5, 13.5, 1e-6, 0.3])
     plt.yscale('log')
@@ -547,7 +555,7 @@ def make_comparison():
     ax.text(0.35, 0.96, 'CCSN yields', transform=ax.transAxes,
             fontsize=12, verticalalignment='top', bbox=props)
 
-    plt.xticks(index + bar_width + 0.11, ('H', 'He', 'C', 'N', 'O', 'Ne', 'Mg', 'Si', 'Fe'))
+    plt.xticks(index + bar_width, ('H', 'He', 'C', 'N', 'O', 'Ne', 'Mg', 'Si', 'Fe'))
     plt.axis([-0.5, 13.5, 1e-6, 0.3])
     plt.yscale('log')
     ax.tick_params(direction='in', axis='both', which='both', pad=4.5)
@@ -565,13 +573,13 @@ def make_comparison():
     ax.text(0.35, 0.96, 'SNIa yields', transform=ax.transAxes,
             fontsize=12, verticalalignment='top', bbox=props)
 
-    plt.xticks(index + bar_width + 0.11, ('H', 'He', 'C', 'N', 'O', 'Ne', 'Mg', 'Si', 'Fe'))
+    plt.xticks(index + bar_width, ('H', 'He', 'C', 'N', 'O', 'Ne', 'Mg', 'Si', 'Fe'))
     plt.axis([-0.5, 13.5, 1e-6, 0.3])
     plt.yscale('log')
     ax.tick_params(direction='in', axis='both', which='both', pad=4.5)
     ax.get_yaxis().set_ticklabels([])
 
-    plt.savefig('./Comparison_literature_all.png', dpi=300)
+    plt.savefig('./Comparison_0p1Zsolar.png', dpi=300)
 
 
 if __name__ == "__main__":
