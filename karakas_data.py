@@ -108,10 +108,7 @@ def calculate_net_yields(yields_info, index):
         if i == yields_info.num_species - 1 :
             yields_interpolated[i, :] *= (1. / 2.)  # Here I apply a correction factor of 2 for Barium
 
-        # if (i == 3) & (index == 0):
-        #   yields_interpolated *= 1.5 # Here I apply a boost factor of 2 for Nitrogen
-
-    select = np.where(yields_info.mass_bins == 4.0)[0]  # Don't remember why I did this correction
+    select = np.where(yields_info.mass_bins == 4.0)[0]  # Minor correction
     yields_interpolated[10, select] = yields_interpolated[10, select - 2]
     return yields_interpolated
 

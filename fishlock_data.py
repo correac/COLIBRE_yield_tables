@@ -40,8 +40,6 @@ class make_yield_tables:
             initial_mass = data[data[:, 1] == sp, 0]
             mass_ejected = data[data[:, 1] == sp, 4]
 
-            # if i == 3: data_yields *= 1.5 # Boosting Nitrogen!!
-
             self.yields[i, :] = interpolate_data(initial_mass, data_yields, self.mass_bins)
             mass_ejected_list[i, :] = interpolate_data(initial_mass, mass_ejected, self.mass_bins)
 
@@ -55,28 +53,24 @@ class make_yield_tables:
             Y_Z014 = data_file["/Yields/Z_0.014/Yield"][:][:]
 
         Zbins = np.array([0.007, 0.014])
-        Sr_data_yields = np.zeros((len(self.mass_bins), 2))
-        Ba_data_yields = np.zeros((len(self.mass_bins), 2))
 
-        for j, m in enumerate(self.mass_bins):
+        # Extract Sr and Ba yields for the given metallicities
+        Sr_data_yields = np.array([Y_Z007[-2, :], Y_Z014[-2, :]]).T
+        Ba_data_yields = np.array([Y_Z007[-1, :], Y_Z014[-1, :]]).T
 
-            # Sr
-            Sr_data_yields[:, 0] = Y_Z007[-2, :]
-            Sr_data_yields[:, 1] = Y_Z014[-2, :]
-            # Ba
-            Ba_data_yields[:, 0] = Y_Z007[-1, :]
-            Ba_data_yields[:, 1] = Y_Z014[-1, :]
+        # For Z=0.001 we extrapolate ...
+        z_target = 0.001
 
-            # For Z=0.001 we extrapolate ...
-            # Sr
-            alpha = (np.log10(Sr_data_yields[j, 1]) - np.log10(Sr_data_yields[j, 0])) / (Zbins[1] - Zbins[0])
-            beta = np.log10(Sr_data_yields[j, 1]) - alpha * Zbins[1]
-            self.yields[-2, j] = 2 * 10**(alpha * 0.001 + beta)
+        # Calculate interpolation coefficients
+        alpha_Sr = (np.log10(Sr_data_yields[:, 1]) - np.log10(Sr_data_yields[:, 0])) / (Zbins[1] - Zbins[0])
+        beta_Sr = np.log10(Sr_data_yields[:, 1]) - alpha_Sr * Zbins[1]
+        alpha_Ba = (Ba_data_yields[:, 1] - Ba_data_yields[:, 0]) / (Zbins[1] - Zbins[0])
+        beta_Ba = Ba_data_yields[:, 1] - alpha_Ba * Zbins[1]
 
-            # Ba
-            alpha = (Ba_data_yields[j, 1] - Ba_data_yields[j, 0]) / (Zbins[1] - Zbins[0])
-            beta = Ba_data_yields[j, 1] - alpha * Zbins[1]
-            self.yields[-1, j] = alpha * 0.001 + beta
+        # Extrapolate yields for Z=0.001
+        self.yields[-2, :] = 2 * 10 ** (alpha_Sr * z_target + beta_Sr)
+        self.yields[-1, :] = alpha_Ba * z_target + beta_Ba
+
 
     def output_table(self):
 

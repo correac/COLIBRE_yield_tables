@@ -8,7 +8,7 @@ class make_yield_tables:
 
         # Table details, let's specify metallicity and mass bins :
         self.Z_bins = np.array([0.0001, 0.004])
-        self.num_Z_bins = len(self.Z_bins)
+        self.num_Z_bins = self.Z_bins.size
 
         self.species = np.array(
             [1, 2, 6, 7, 8, 10, 12, 14, 16, 20, 26, 38, 56])  # H, He, C, N, O, Ne, Mg, Si, S, Ca, Fe, Sr & Ba
@@ -24,20 +24,22 @@ class make_yield_tables:
     def read_data(self, z_index):
 
         species_list = np.array(['p','He','C','N','O','Ne','Mg','Si','S','Ca','Fe','g','g'])
-
         data = np.loadtxt("./data/Karakas2010/data.txt", comments='#', usecols=(0, 2, 3, 5, 6, 7, 8))
         species = np.loadtxt("./data/Karakas2010/data.txt", comments='#', usecols=(4), dtype='str')
-        z_bins = np.where(data[:,1] == self.Z_bins[z_index])[0]
-        data = data[z_bins,:]
+
+        # Filter data based on metallicity
+        z_bins = data[:, 1] == self.Z_bins[z_index]
+        data = data[z_bins]
         species = species[z_bins]
 
         yields = np.zeros((self.num_species, self.num_mass_bins))
 
-        for i in range(0, self.num_species):
+        # Iterate over species to compute yields
+        for i, sp in enumerate(species_list):
 
-            sp = species_list[i]
-            select_species = np.where(species==sp)[0]
-            if len(select_species)==0:continue # Element not found
+            select_species = species == sp
+            if not np.any(select_species):
+                continue  # Skip if species not found
 
             # Here yields are net yields, defined as the total mass (of each element)
             # that is expelled to the ISM during the star lifetime: Xi x Mej
@@ -47,14 +49,14 @@ class make_yield_tables:
             index = np.append(index,len(data[select_species, 0]))
             final_mass = np.unique(data[select_species, 2])
             mass_ejected_data = initial_mass - final_mass
+
             data_yields = np.zeros(len(initial_mass))
             for ii in range(len(data_yields)):data_yields[ii] = np.sum(data_yields_prev[index[ii]:index[ii+1]])
 
-            # if (z_index == 0) & (i == 3): data_yields *= 1.5  # Boosting Nitrogen
-            # if (z_index == 1) & (i == 3): data_yields *= 1.5  # Boosting Nitrogen
-
+            # Interpolate yields and mass ejected data to match mass bins
             yields[i, :] = interpolate_data(initial_mass, data_yields, self.mass_bins)
-            if i==0: mass_ejected = interpolate_data(initial_mass, mass_ejected_data, self.mass_bins)
+            if i == 0:
+                mass_ejected = interpolate_data(initial_mass, mass_ejected_data, self.mass_bins)
 
         return yields, mass_ejected
 
@@ -65,33 +67,21 @@ class make_yield_tables:
             Y_Z014 = data_file["/Yields/Z_0.014/Yield"][:][:]
 
         Zbins = np.array([0.007, 0.014])
-        Sr_data_yields = np.zeros((len(self.mass_bins), 2))
-        Ba_data_yields = np.zeros((len(self.mass_bins), 2))
 
+        Sr_data_yields = np.array([Y_Z007[-2, :], Y_Z014[-2, :]]).T
+        Ba_data_yields = np.array([Y_Z007[-1, :], Y_Z014[-1, :]]).T
+
+        # Interpolate Sr and Ba data across mass bins
         for j, m in enumerate(self.mass_bins):
+            # Sr interpolation
+            sr_alpha = (np.log10(Sr_data_yields[j, 1]) - np.log10(Sr_data_yields[j, 0])) / (Zbins[1] - Zbins[0])
+            sr_beta = np.log10(Sr_data_yields[j, 1]) - sr_alpha * Zbins[1]
+            yields[-2, j] = 2 * 10 ** (sr_alpha * self.Z_bins[z_index] + sr_beta)
 
-            # Sr
-            Sr_data_yields[:, 0] = Y_Z007[-2, :]
-            Sr_data_yields[:, 1] = Y_Z014[-2, :]
-            # Ba
-            Ba_data_yields[:, 0] = Y_Z007[-1, :]
-            Ba_data_yields[:, 1] = Y_Z014[-1, :]
-
-            # Sr
-            alpha = (np.log10(Sr_data_yields[j, 1]) - np.log10(Sr_data_yields[j, 0])) / (Zbins[1] - Zbins[0])
-            beta = np.log10(Sr_data_yields[j, 1]) - alpha * Zbins[1]
-            if z_index == 0:
-                yields[-2, j] = 2 * 10**(alpha * 0.0001 + beta)
-            else:
-                yields[-2, j] = 2 * 10**(alpha * 0.004 + beta)
-
-            # Ba
-            alpha = (Ba_data_yields[j, 1] - Ba_data_yields[j, 0]) / (Zbins[1] - Zbins[0])
-            beta = Ba_data_yields[j, 1] - alpha * Zbins[1]
-            if z_index == 0:
-                yields[-1, j] = alpha * 0.0001 + beta
-            else:
-                yields[-1, j] = alpha * 0.004 + beta
+            # Ba interpolation
+            ba_alpha = (Ba_data_yields[j, 1] - Ba_data_yields[j, 0]) / (Zbins[1] - Zbins[0])
+            ba_beta = Ba_data_yields[j, 1] - ba_alpha * Zbins[1]
+            yields[-1, j] = ba_alpha * self.Z_bins[z_index] + ba_beta
 
         return yields
 
