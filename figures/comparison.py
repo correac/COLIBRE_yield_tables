@@ -71,7 +71,7 @@ def integrate_IMF(m_min, m_max, num_points=1000):
     return IMF_int
 
 
-def lifetimes(m, Z, filename='../data/EAGLE_yieldtables/Lifetimes.hdf5'):
+def lifetimes(m, Z, filename='./data/EAGLE_yieldtables/Lifetimes.hdf5'):
     """
     Interpolates stellar lifetimes based on mass and metallicity.
 
@@ -101,7 +101,7 @@ def lifetimes(m, Z, filename='../data/EAGLE_yieldtables/Lifetimes.hdf5'):
     return result
 
 
-def inverse_lifetime(Z, filename='../data/EAGLE_yieldtables/Lifetimes.hdf5'):
+def inverse_lifetime(Z, filename='./data/EAGLE_yieldtables/Lifetimes.hdf5'):
     """
     Finds the minimum mass with a lifetime shorter than the Hubble time for a given metallicity.
 
@@ -168,7 +168,7 @@ def interpolate_yields(Masses, stellar_yields, mass_range, elements=9):
 
 def read_AGB_COLIBRE(metallicity_flag, metallicity, total_mass_fraction, mass_fraction):
     factor = metallicity / total_mass_fraction
-    Masses, Yield, Ejected_mass, Total_metals = read_AGB_Yields('../data/AGB.hdf5', metallicity_flag)
+    Masses, Yield, Ejected_mass, Total_metals = read_AGB_Yields('./data/AGB.hdf5', metallicity_flag)
     stellar_yields, _ = compute_AGB_stellar_yields(Masses, Yield, Ejected_mass, Total_metals, factor, mass_fraction,
                                                total_mass_fraction)
 
@@ -181,7 +181,7 @@ def read_AGB_COLIBRE(metallicity_flag, metallicity, total_mass_fraction, mass_fr
 
 def read_AGB_EAGLE(metallicity_flag, metallicity, total_mass_fraction, mass_fraction):
     factor = metallicity / total_mass_fraction
-    Masses, Yield, Ejected_mass, Total_metals = read_AGB_Yields('../data/EAGLE_yieldtables/AGB.hdf5', metallicity_flag)
+    Masses, Yield, Ejected_mass, Total_metals = read_AGB_Yields('./data/EAGLE_yieldtables/AGB.hdf5', metallicity_flag)
     stellar_yields, _ = compute_AGB_stellar_yields(Masses, Yield, Ejected_mass, Total_metals, factor, mass_fraction,
                                                total_mass_fraction)
 
@@ -220,7 +220,7 @@ def read_SNII_COLIBRE(metallicity_flag, metallicity, total_mass_fraction):
     factor = metallicity / total_mass_fraction
 
     # Read data from HDF5 file
-    with h5py.File('../data/SNII_linear_extrapolation.hdf5', 'r') as data_file:
+    with h5py.File('./data/SNII_linear_extrapolation.hdf5', 'r') as data_file:
         Masses = data_file["Masses"][:]
         Ejected_mass_winds = data_file[f"/Yields/Z_{metallicity_flag}/Ejected_mass_in_winds"][:]
         Ejected_mass_ccsn = data_file[f"/Yields/Z_{metallicity_flag}/Ejected_mass_in_ccsn"][:]
@@ -248,7 +248,7 @@ def read_SNII_EAGLE(metallicity_flag, metallicity, total_mass_fraction):
     factor = metallicity / total_mass_fraction
 
     # Read data from HDF5 file
-    with h5py.File('../data/EAGLE_yieldtables/SNII.hdf5', 'r') as data_file:
+    with h5py.File('./data/EAGLE_yieldtables/SNII.hdf5', 'r') as data_file:
         Masses = data_file["Masses"][:]
         Yield = data_file[f"/Yields/Z_{metallicity_flag}/Yield"][:]
         Ejected_mass = data_file[f"/Yields/Z_{metallicity_flag}/Ejected_mass"][:]
@@ -403,7 +403,7 @@ def read_SNIa_EAGLE(total_mass_fraction):
     ndarray: The integrated and normalized stellar yields for EAGLE.
     """
 
-    filename = '../data/EAGLE_yieldtables/SNIa.hdf5'
+    filename = './data/EAGLE_yieldtables/SNIa.hdf5'
 
     # Select elements: Hydrogen, Helium, Neon, Magnesium, Silicon, Sulfur, Calcium, Nickel, Iron
     indx = np.array([0, 1, 5, 6, 7, 9, 11, 13, 25])
@@ -426,7 +426,7 @@ def read_SNIa_COLIBRE(total_mass_fraction):
     ndarray: The integrated and normalized stellar yields for COLIBRE.
     """
     # Load stellar yields from HDF5 file
-    filename = '../data/LeungNomoto2018/SNIa_W7LeungNomoto2018.hdf5'
+    filename = './data/SNIa.hdf5'
 
     # Select elements?
     indx = None
@@ -535,7 +535,7 @@ def make_comparison():
     ax.tick_params(direction='in', axis='both', which='both', pad=4.5)
     ax.get_yaxis().set_ticklabels([])
 
-    plt.savefig('./Comparison_literature_all.png', dpi=300)
+    plt.savefig('./figures/Comparison_literature_all.png', dpi=300)
 
 
 if __name__ == "__main__":

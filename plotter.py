@@ -389,6 +389,24 @@ def plot_CCSN_yield_tables():
         Z_ind = [x.decode() for x in data_file['Yield_names']]
         indx = np.arange(len(Z_ind))
 
+    # Plot parameters
+    params = {
+        "font.size": 11,
+        "font.family": "Times",
+        "text.usetex": True,
+        "figure.figsize": (4, 3),
+        "figure.subplot.left": 0.15,
+        "figure.subplot.right": 0.97,
+        "figure.subplot.bottom": 0.15,
+        "figure.subplot.top": 0.93,
+        "figure.subplot.wspace": 0.25,
+        "figure.subplot.hspace": 0.25,
+        "lines.markersize": 3,
+        "lines.linewidth": 1,
+        "figure.max_open_warning": 0,
+    }
+    rcParams.update(params)
+
     for i, elem in enumerate(indx):
 
         plt.figure()

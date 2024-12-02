@@ -48,7 +48,7 @@ class make_yield_tables:
 
     def complete_for_s_process(self):
 
-        with h5py.File('./data/AGB.hdf5', 'r') as data_file:
+        with h5py.File('./data/Karakas2016/AGB_Karakas2016.hdf5', 'r') as data_file:
             Y_Z007 = data_file["/Yields/Z_0.007/Yield"][:][:]
             Y_Z014 = data_file["/Yields/Z_0.014/Yield"][:][:]
 
