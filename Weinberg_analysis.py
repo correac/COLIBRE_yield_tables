@@ -363,16 +363,26 @@ def calculate_yield_ratios():
 
 if __name__ == "__main__":
 
-    calculate_yield_ratios()
+    # calculate_yield_ratios()
 
     # num_massive = integrate_num_stars(8, 100)
-    # num_all = integrate_num_stars(0.08, 100)
+    num_all = integrate_num_stars(0.01, 100)
+    #print(num_massive)
+    print(num_all)
+
     # value = num_massive / num_all
     # print("Fraction of massive stars that explode as CCSN")
     # print(value)
     #
-    # IMF_all = integrate_IMF(0.08, 100)
+    IMF_all = integrate_IMF(0.01, 100)
+    print(IMF_all)
     # num_massive = integrate_num_stars(8, 100)
     # value = num_massive / IMF_all
     # print("Number of massive stars per unit mass of star formation:")
     # print(value)
+
+    print("Number of stars per unit mass of stellar particle:")
+    value = num_all / IMF_all
+    print(value)
+    part_mass = 1e6
+    print(value * 1e6)
